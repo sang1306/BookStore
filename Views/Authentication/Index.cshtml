@@ -38,43 +38,45 @@
 
 			<div class="tab-content mt-3">
 				<!-- Login Form -->
-                <div class="tab-pane fade show active" id="login">
-                    <h3>Login</h3>
-                    <form method="post" id="loginForm" action="/auth/login">
-                        <div class="mb-3">
-                            <label class="form-label">Username or Email</label>
-                            <input type="text" class="form-control" name="Username">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-control" name="Password">
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" name="Remember">
-                            <label class="form-check-label">Remember me</label>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Log In</button>
-                    </form>
-                    <div class="invalid-feedback" id="responseMessage">get right </div>
-                </div>
+				<div class="tab-pane fade show active" id="login">
+					<h3>Login</h3>
+
+					<form method="post" id="loginForm" action="/auth/login">
+						<div class="mb-3">
+							<label class="form-label">Username or Email</label>
+							<input type="text" class="form-control" name="Username" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Password</label>
+							<input type="password" class="form-control" name="Password" required>
+						</div>
+						<div class="mb-3 form-check">
+							<input type="checkbox" class="form-check-input" name="Remember">
+							<label class="form-check-label">Remember me</label>
+						</div>
+						<div class="valid-feedback mb-3" id="responseMessage"></div>
+						<button type="submit" class="btn btn-primary w-100">Log In</button>
+					</form>
+				</div>
 
 				<!-- Sign Up Form -->
 				<div class="tab-pane fade" id="signup">
 					<h3>Sign Up</h3>
-					<form id="signUpForm">
+					<form id="signUpForm" method="post" action="/auth/signup">
 						<div class="mb-3">
-							<label class="form-label">Full Name</label>
-							<input type="text" class="form-control">
+							<label class="form-label">Username</label>
+							<input type="text" class="form-control" name="Username" required>
 						</div>
 						<div class="mb-3">
 							<label class="form-label">Email</label>
-							<input type="email" class="form-control">
+							<input type="email" class="form-control" name="Email" required>
 						</div>
 						<div class="mb-3">
 							<label class="form-label">Password</label>
-							<input type="password" class="form-control">
+							<input type="password" class="form-control" name="Password" required>
 						</div>
 						<button type="submit" class="btn btn-primary w-100">Sign Up</button>
+						<div class="valid-feedback mb-3" id="responseMessage1"></div>
 					</form>
 				</div>
 			</div>
@@ -82,34 +84,90 @@
 	</div>
 </div>
 <script>
-	$("#loginForm").submit(function(e) {
+		$("#signUpForm").submit( function(e){
+			e.preventDefault();
+			var form = $(this);
+			var actionUrl = form.attr('action');
+			console.log('action: ' +actionUrl);
 
-		e.preventDefault(); // avoid to execute the actual submit of the form.
+			const formData = new FormData(e.target);
 
-		var form = $(this);
-		var actionUrl = form.attr('action');
-		console.log(form);
-
-		$.ajax({
-			type: "POST",
-			url: actionUrl,
-			data: form.serialize(),
-			success: function(data)
-			{
-				   if (response.success) {
-				 	$("#responseMessage").html('<div class="alert alert-success">' + response.message + '</div>');
-				 	setTimeout(function () {
-				 		window.location.href = "/Home/Index"; 
-				 	}, 1500);
-				 } else {
-				 	$("#responseMessage").html('<div class="alert alert-danger">' + response.message + '</div>');
-				 }
-			  console.log(data);
-			},
-			error: function () {
-				$("#responseMessage").html('<div class="alert alert-danger">Something went wrong.</div>');
+			var requestData = {
+				Username: formData.get('Username'),
+				Password: formData.get('Password'),
+				Email: formData.get('Email')
 			}
+			console.log(requestData);
+			$.ajax({
+				type:"POST",
+				url: actionUrl,
+				data: requestData,
+				success: (data) => {
+					console.log(data);
+					if (data.success) {
+						$("#responseMessage1").html('<div class="alert alert-success">' + data.message + '</div>');
+						setTimeout(function () {
+							window.location.href = "/Home/Index";
+						}, 1500);
+					 } else {
+						var responseMessage = document.getElementById("responseMessage1");
+						responseMessage.classList.remove("valid-feedback", "invalid-feedback");
+						responseMessage.classList.add("invalid-feedback");
+						responseMessage.innerText = data.message;
+						responseMessage.style.display = "block";
+					 }
+				},
+				error: () => {
+					$("#responseMessage1").html('<div class="alert alert-danger">Something went wrong.</div>');
+				}
+			});
+		});
+		$("#loginForm").submit(function(e) {
+			e.preventDefault();
+			var form = $(this);
+			var actionUrl = form.attr('action');
+			console.log(actionUrl);
+
+			const formData = new FormData(e.target);
+			formData.Remember = document.querySelector("[name='Remember']").checked; // Ensure checkbox value is boolean
+			console.log(formData.get('Username'));
+	``
+			var requestData = {
+				Username: formData.get('Username'),
+				Password: formData.get('Password'),
+				Remember: formData.Remember
+			}
+			console.log(requestData);
+
+			$.ajax({
+				type: "POST",
+				url: actionUrl,
+				data: requestData,
+				success: function(data)
+				{
+				  console.log(data);
+					 if (data.success) {
+						var responseMessage = document.getElementById("responseMessage");
+						responseMessage.classList.remove("valid-feedback", "invalid-feedback");
+						responseMessage.classList.add("valid-feedback");
+						responseMessage.innerText = data.message;
+						responseMessage.style.display = "block";
+
+						setTimeout(function () {
+							window.location.href = "/Home/Index";
+						}, 1500);
+					 } else {
+						var responseMessage = document.getElementById("responseMessage");
+						responseMessage.classList.remove("valid-feedback", "invalid-feedback");
+						responseMessage.classList.add("invalid-feedback");
+						responseMessage.innerText = data.message;
+						responseMessage.style.display = "block";
+					 }
+				},
+				error: function () {
+					$("#responseMessage").html('<div class="alert alert-danger">Something went wrong.</div>');
+				}
+			});
 		});
 
-	});
 </script>
