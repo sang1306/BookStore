@@ -12,9 +12,15 @@ namespace BookStore.Controllers
         }
 
         [Route("Login")]
-        public IActionResult Login()
+        [HttpPost]
+        public IActionResult Login(string Username, string Password, bool Remember)
         {
-            return View();
+            if (Username == "admin" && Password == "password") // Dummy check
+            {
+                return Json(new { success = true, message = "Login successful!" });
+            }
+            return Json(new { success = false, message = "Invalid username or password." });
         }
+
     }
 }

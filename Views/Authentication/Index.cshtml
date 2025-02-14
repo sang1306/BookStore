@@ -1,0 +1,115 @@
+﻿<style>
+	.auth-wrapper {
+		position: relative;
+		width: 100%;
+	}
+
+	.bg-image {
+		width: 100%;
+		height: auto;
+		display: block;
+	}
+
+	.auth-container {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background: rgba(255, 255, 255, 0.8); /* Optional: Add a semi-transparent background */
+		padding: 20px;
+		border-radius: 10px;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+		width: 80%;
+		max-width: 400px;
+	}
+</style>
+<div class="auth-wrapper">
+	<img src="~/image/bg_auth.jpg" class="bg-image" />
+	<div class="container mt-5 auth-container">
+		<div class="card shadow-sm p-4">
+			<ul class="nav nav-tabs" id="authTabs">
+				<li class="nav-item">
+					<a class="nav-link active" id="login-tab" data-bs-toggle="tab" href="#login">Login</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" id="signup-tab" data-bs-toggle="tab" href="#signup">Sign Up</a>
+				</li>
+			</ul>
+
+			<div class="tab-content mt-3">
+				<!-- Login Form -->
+                <div class="tab-pane fade show active" id="login">
+                    <h3>Login</h3>
+                    <form method="post" id="loginForm" action="/auth/login">
+                        <div class="mb-3">
+                            <label class="form-label">Username or Email</label>
+                            <input type="text" class="form-control" name="Username">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" name="Password">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" name="Remember">
+                            <label class="form-check-label">Remember me</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Log In</button>
+                    </form>
+                    <div class="invalid-feedback" id="responseMessage">get right </div>
+                </div>
+
+				<!-- Sign Up Form -->
+				<div class="tab-pane fade" id="signup">
+					<h3>Sign Up</h3>
+					<form id="signUpForm">
+						<div class="mb-3">
+							<label class="form-label">Full Name</label>
+							<input type="text" class="form-control">
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Email</label>
+							<input type="email" class="form-control">
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Password</label>
+							<input type="password" class="form-control">
+						</div>
+						<button type="submit" class="btn btn-primary w-100">Sign Up</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	$("#loginForm").submit(function(e) {
+
+		e.preventDefault(); // avoid to execute the actual submit of the form.
+
+		var form = $(this);
+		var actionUrl = form.attr('action');
+		console.log(form);
+
+		$.ajax({
+			type: "POST",
+			url: actionUrl,
+			data: form.serialize(),
+			success: function(data)
+			{
+				   if (response.success) {
+				 	$("#responseMessage").html('<div class="alert alert-success">' + response.message + '</div>');
+				 	setTimeout(function () {
+				 		window.location.href = "/Home/Index"; 
+				 	}, 1500);
+				 } else {
+				 	$("#responseMessage").html('<div class="alert alert-danger">' + response.message + '</div>');
+				 }
+			  console.log(data);
+			},
+			error: function () {
+				$("#responseMessage").html('<div class="alert alert-danger">Something went wrong.</div>');
+			}
+		});
+
+	});
+</script>
