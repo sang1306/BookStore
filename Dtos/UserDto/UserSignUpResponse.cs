@@ -1,4 +1,4 @@
-﻿namespace BookStore.Dtos
+﻿namespace BookStore.Dtos.UserDto
 {
     public class UserSignUpResponse
     {

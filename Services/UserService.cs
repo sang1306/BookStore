@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using BookStore.Dtos;
+using BookStore.Dtos.UserDto;
 using BookStore.Enums;
 using BookStore.Models;
+using BookStore.Services.Jwt;
 using BookStore.Utils;
 using chat_application_demo.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +13,11 @@ namespace BookStore.Services
     {
 
         private readonly Prn222BookshopContext _context;
-        public UserService(Prn222BookshopContext context)
+        private readonly IJwtService _jwtService;
+        public UserService(Prn222BookshopContext context, IJwtService jwtService)
         {
             _context = context;
+            _jwtService = jwtService;
         }
 
         public async Task<UserLoginResponse> UserLogin(UserLoginRequest request, HttpContext httpContext)
@@ -24,20 +27,24 @@ namespace BookStore.Services
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == request.Username);
             if (user != null)
             {
-                Console.WriteLine("passrequest: " + passRequest);
-                Console.WriteLine(": " + passRequest);
                 if (passRequest == user.Password)
                 {
                     // add session 
                     UserSessionManager.SetUserInfo(httpContext, user);
-                    // generate key
 
+                    // generate key if have remember me
+                    string token = "";
+                    if (request.Remember)
+                    {
+                        long oneweek = 60 * 24 * 7;
+                        token = _jwtService.GenerateToken(user.Username, oneweek);
+                    }
                     // return success
                     return new UserLoginResponse()
                     {
                         Success = true,
                         Message = "Login successful!",
-                        Key = "asdfasfwer2323"
+                        Key = token
                     };
                 }
                 else
@@ -112,8 +119,20 @@ namespace BookStore.Services
             };
         }
 
-        public void UserSignOut(HttpContext httpContext)
+
+        public async Task<bool> ValidateToken(string token, HttpContext httpContext)
         {
+            string usename = _jwtService.ValidateToken(token);
+            if (usename != null)
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == usename);
+                if (user != null)
+                {
+                    UserSessionManager.SetUserInfo(httpContext, user);
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

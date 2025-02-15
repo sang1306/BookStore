@@ -1,5 +1,6 @@
 using BookStore.Models;
 using BookStore.Services;
+using BookStore.Services.Jwt;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,7 @@ builder.Services.AddDbContext<Prn222BookshopContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddTransient<UserService>();
+builder.Services.AddSingleton<IJwtService, JwtService>();
 
 // session config
 builder.Services.AddSession(options =>

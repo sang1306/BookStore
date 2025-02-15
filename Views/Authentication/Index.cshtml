@@ -84,90 +84,125 @@
 	</div>
 </div>
 <script>
-		$("#signUpForm").submit( function(e){
-			e.preventDefault();
-			var form = $(this);
-			var actionUrl = form.attr('action');
-			console.log('action: ' +actionUrl);
+	$("#signUpForm").submit( function(e){
+		e.preventDefault();
+		var form = $(this);
+		var actionUrl = form.attr('action');
+		console.log('action: ' +actionUrl);
 
-			const formData = new FormData(e.target);
+		const formData = new FormData(e.target);
 
-			var requestData = {
-				Username: formData.get('Username'),
-				Password: formData.get('Password'),
-				Email: formData.get('Email')
+		var requestData = {
+			Username: formData.get('Username'),
+			Password: formData.get('Password'),
+			Email: formData.get('Email')
+		}
+		console.log(requestData);
+		$.ajax({
+			type:"POST",
+			url: actionUrl,
+			data: requestData,
+			success: (data) => {
+				console.log(data);
+				if (data.success) {
+					$("#responseMessage1").html('<div class="alert alert-success">' + data.message + '</div>');
+					setTimeout(function () {
+						window.location.href = "/Home/Index";
+					}, 1500);
+				 } else {
+					var responseMessage = document.getElementById("responseMessage1");
+					responseMessage.classList.remove("valid-feedback", "invalid-feedback");
+					responseMessage.classList.add("invalid-feedback");
+					responseMessage.innerText = data.message;
+					responseMessage.style.display = "block";
+				 }
+			},
+			error: () => {
+				$("#responseMessage1").html('<div class="alert alert-danger">Something went wrong.</div>');
 			}
-			console.log(requestData);
-			$.ajax({
-				type:"POST",
-				url: actionUrl,
-				data: requestData,
-				success: (data) => {
-					console.log(data);
-					if (data.success) {
-						$("#responseMessage1").html('<div class="alert alert-success">' + data.message + '</div>');
-						setTimeout(function () {
-							window.location.href = "/Home/Index";
-						}, 1500);
-					 } else {
-						var responseMessage = document.getElementById("responseMessage1");
-						responseMessage.classList.remove("valid-feedback", "invalid-feedback");
-						responseMessage.classList.add("invalid-feedback");
-						responseMessage.innerText = data.message;
-						responseMessage.style.display = "block";
-					 }
-				},
-				error: () => {
-					$("#responseMessage1").html('<div class="alert alert-danger">Something went wrong.</div>');
-				}
-			});
 		});
-		$("#loginForm").submit(function(e) {
-			e.preventDefault();
-			var form = $(this);
-			var actionUrl = form.attr('action');
-			console.log(actionUrl);
+	});
+	$("#loginForm").submit(function(e) {
+		e.preventDefault();
+		var form = $(this);
+		var actionUrl = form.attr('action');
+		console.log(actionUrl);
 
-			const formData = new FormData(e.target);
-			formData.Remember = document.querySelector("[name='Remember']").checked; // Ensure checkbox value is boolean
-			console.log(formData.get('Username'));
-	``
-			var requestData = {
-				Username: formData.get('Username'),
-				Password: formData.get('Password'),
-				Remember: formData.Remember
+		const formData = new FormData(e.target);
+		formData.Remember = document.querySelector("[name='Remember']").checked; // Ensure checkbox value is boolean
+		console.log(formData.get('Username'));
+
+		var requestData = {
+			Username: formData.get('Username'),
+			Password: formData.get('Password'),
+			Remember: formData.Remember
+		}
+		console.log(requestData);
+
+		$.ajax({
+			type: "POST",
+			url: actionUrl,
+			data: requestData,
+			success: function(data)
+			{
+				handleResponse(data);
+			},
+			error: function () {
+				$("#responseMessage").html('<div class="alert alert-danger">Something went wrong.</div>');
 			}
-			console.log(requestData);
-
-			$.ajax({
-				type: "POST",
-				url: actionUrl,
-				data: requestData,
-				success: function(data)
-				{
-				  console.log(data);
-					 if (data.success) {
-						var responseMessage = document.getElementById("responseMessage");
-						responseMessage.classList.remove("valid-feedback", "invalid-feedback");
-						responseMessage.classList.add("valid-feedback");
-						responseMessage.innerText = data.message;
-						responseMessage.style.display = "block";
-
-						setTimeout(function () {
-							window.location.href = "/Home/Index";
-						}, 1500);
-					 } else {
-						var responseMessage = document.getElementById("responseMessage");
-						responseMessage.classList.remove("valid-feedback", "invalid-feedback");
-						responseMessage.classList.add("invalid-feedback");
-						responseMessage.innerText = data.message;
-						responseMessage.style.display = "block";
-					 }
-				},
-				error: function () {
-					$("#responseMessage").html('<div class="alert alert-danger">Something went wrong.</div>');
-				}
-			});
 		});
+	});
+	function handleResponse(data){
+		console.log(data);
+		if (data.success) {
+			var responseMessage = document.getElementById("responseMessage");
+			responseMessage.classList.remove("valid-feedback", "invalid-feedback");
+			responseMessage.classList.add("valid-feedback");
+			responseMessage.innerText = data.message;
+			responseMessage.style.display = "block";
 
+			if(data.key){
+				setRememberMe(data.key);
+			}
+			setTimeout(function () {
+				window.location.href = "/Home/Index";
+			}, 1500);
+		} else {
+			var responseMessage = document.getElementById("responseMessage");
+			responseMessage.classList.remove("valid-feedback", "invalid-feedback");
+			responseMessage.classList.add("invalid-feedback");
+			responseMessage.innerText = data.message;
+			responseMessage.style.display = "block";
+		}
+	}
+	 document.addEventListener("DOMContentLoaded", function () {
+		let token = getRememberMe();
+		
+		console.log(token);
+
+		if (token) {
+			fetch("/auth/ValidateToken", {
+				method: "POST",
+				headers: {
+					"Authorization": "Bearer " + token,
+					"Content-Type": "application/json"
+				}
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.isAuthenticated) {
+					console.log("User is logged in. ");
+					window.location.href = "/Home/index";
+				} else {
+					console.log("return false");
+					removeRememberMe(); 
+					window.location.href = "/auth/login";
+				}
+			})
+			.catch(() => {
+				removeRememberMe();
+				window.location.href = "/auth/login";
+			});
+		}
+	});
 </script>

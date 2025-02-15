@@ -1,4 +1,5 @@
-﻿using BookStore.Dtos;
+﻿using System.IdentityModel.Tokens.Jwt;
+using BookStore.Dtos.UserDto;
 using BookStore.Models;
 using BookStore.Services;
 using chat_application_demo.Utils;
@@ -17,6 +18,7 @@ namespace BookStore.Controllers
         }
 
 
+        //[TypeFilter(typeof(AuthenticationFilter))]
         [Route("Index")]
         public IActionResult Index()
         {
@@ -31,7 +33,7 @@ namespace BookStore.Controllers
             return Json(response);
         }
 
-        [Route("signup")]
+        [Route("SignUp")]
         [HttpPost]
         public async Task<IActionResult> SignUp(UserSignUpRequest signup)
         {
@@ -47,5 +49,14 @@ namespace BookStore.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Route("ValidateToken")]
+        [HttpPost]
+        public IActionResult ValidateToken()
+        {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var isValid = _userService.ValidateToken(token, HttpContext); 
+
+            return Json(new { isAuthenticated = isValid });
+        }
     }
 }
