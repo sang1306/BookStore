@@ -40,7 +40,6 @@
 				<!-- Login Form -->
 				<div class="tab-pane fade show active" id="login">
 					<h3>Login</h3>
-
 					<form method="post" id="loginForm" action="/auth/login">
 						<div class="mb-3">
 							<label class="form-label">Username or Email</label>
@@ -50,11 +49,21 @@
 							<label class="form-label">Password</label>
 							<input type="password" class="form-control" name="Password" required>
 						</div>
-						<div class="mb-3 form-check">
-							<input type="checkbox" class="form-check-input" name="Remember">
-							<label class="form-check-label">Remember me</label>
+
+						<div style="display:flex; gap:5px; justify-items:center;" class="mb-3">
+							<div class="form-check">
+								<input type="checkbox" id="rememberinput" class="form-check-input" name="Remember">
+								<label class="form-check-label" for="rememberinput" style="font-size:13px">Remember me</label>
+							</div>
+							<a class="link forgotpass" asp-action="ForgotPass" asp-controller="Authentication">Forgot your password?</a>
 						</div>
-						<div class="valid-feedback mb-3" id="responseMessage"></div>
+						<div class="valid-feedback mb-3" id="responseMessage">
+						</div>
+						@if (TempData["mess"] != null)
+						{
+							<div class="alert alert-info">@TempData["mess"]</div>
+						}
+						<div></div>
 						<button type="submit" class="btn btn-primary w-100">Log In</button>
 					</form>
 				</div>
@@ -177,7 +186,7 @@
 	}
 	 document.addEventListener("DOMContentLoaded", function () {
 		let token = getRememberMe();
-		
+
 		console.log(token);
 
 		if (token) {
@@ -195,7 +204,7 @@
 					window.location.href = "/Home/index";
 				} else {
 					console.log("return false");
-					removeRememberMe(); 
+					removeRememberMe();
 					window.location.href = "/auth/login";
 				}
 			})
