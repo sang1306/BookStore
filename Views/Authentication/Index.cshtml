@@ -1,0 +1,217 @@
+﻿<style>
+	.auth-wrapper {
+		position: relative;
+		width: 100%;
+	}
+
+	.bg-image {
+		width: 100%;
+		height: auto;
+		display: block;
+	}
+
+	.auth-container {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background: rgba(255, 255, 255, 0.8); /* Optional: Add a semi-transparent background */
+		padding: 20px;
+		border-radius: 10px;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+		width: 80%;
+		max-width: 400px;
+	}
+</style>
+<div class="auth-wrapper">
+	<img src="~/image/bg_auth.jpg" class="bg-image" />
+	<div class="container mt-5 auth-container">
+		<div class="card shadow-sm p-4">
+			<ul class="nav nav-tabs" id="authTabs">
+				<li class="nav-item">
+					<a class="nav-link active" id="login-tab" data-bs-toggle="tab" href="#login">Login</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" id="signup-tab" data-bs-toggle="tab" href="#signup">Sign Up</a>
+				</li>
+			</ul>
+
+			<div class="tab-content mt-3">
+				<!-- Login Form -->
+				<div class="tab-pane fade show active" id="login">
+					<h3>Login</h3>
+					<form method="post" id="loginForm" action="/auth/login">
+						<div class="mb-3">
+							<label class="form-label">Username or Email</label>
+							<input type="text" class="form-control" name="Username" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Password</label>
+							<input type="password" class="form-control" name="Password" required>
+						</div>
+
+						<div style="display:flex; gap:5px; justify-items:center;" class="mb-3">
+							<div class="form-check">
+								<input type="checkbox" id="rememberinput" class="form-check-input" name="Remember">
+								<label class="form-check-label" for="rememberinput" style="font-size:13px">Remember me</label>
+							</div>
+							<a class="link forgotpass" asp-action="ForgotPass" asp-controller="Authentication">Forgot your password?</a>
+						</div>
+						<div class="valid-feedback mb-3" id="responseMessage">
+						</div>
+						@if (TempData["mess"] != null)
+						{
+							<div class="alert alert-info">@TempData["mess"]</div>
+						}
+						<div></div>
+						<button type="submit" class="btn btn-primary w-100">Log In</button>
+					</form>
+				</div>
+
+				<!-- Sign Up Form -->
+				<div class="tab-pane fade" id="signup">
+					<h3>Sign Up</h3>
+					<form id="signUpForm" method="post" action="/auth/signup">
+						<div class="mb-3">
+							<label class="form-label">Username</label>
+							<input type="text" class="form-control" name="Username" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Email</label>
+							<input type="email" class="form-control" name="Email" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Password</label>
+							<input type="password" class="form-control" name="Password" required>
+						</div>
+						<button type="submit" class="btn btn-primary w-100">Sign Up</button>
+						<div class="valid-feedback mb-3" id="responseMessage1"></div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	$("#signUpForm").submit( function(e){
+		e.preventDefault();
+		var form = $(this);
+		var actionUrl = form.attr('action');
+		console.log('action: ' +actionUrl);
+
+		const formData = new FormData(e.target);
+
+		var requestData = {
+			Username: formData.get('Username'),
+			Password: formData.get('Password'),
+			Email: formData.get('Email')
+		}
+		console.log(requestData);
+		$.ajax({
+			type:"POST",
+			url: actionUrl,
+			data: requestData,
+			success: (data) => {
+				console.log(data);
+				if (data.success) {
+					$("#responseMessage1").html('<div class="alert alert-success">' + data.message + '</div>');
+					setTimeout(function () {
+						window.location.href = "/Home/Index";
+					}, 1500);
+				 } else {
+					var responseMessage = document.getElementById("responseMessage1");
+					responseMessage.classList.remove("valid-feedback", "invalid-feedback");
+					responseMessage.classList.add("invalid-feedback");
+					responseMessage.innerText = data.message;
+					responseMessage.style.display = "block";
+				 }
+			},
+			error: () => {
+				$("#responseMessage1").html('<div class="alert alert-danger">Something went wrong.</div>');
+			}
+		});
+	});
+	$("#loginForm").submit(function(e) {
+		e.preventDefault();
+		var form = $(this);
+		var actionUrl = form.attr('action');
+		console.log(actionUrl);
+
+		const formData = new FormData(e.target);
+		formData.Remember = document.querySelector("[name='Remember']").checked; // Ensure checkbox value is boolean
+		console.log(formData.get('Username'));
+
+		var requestData = {
+			Username: formData.get('Username'),
+			Password: formData.get('Password'),
+			Remember: formData.Remember
+		}
+		console.log(requestData);
+
+		$.ajax({
+			type: "POST",
+			url: actionUrl,
+			data: requestData,
+			success: function(data)
+			{
+				handleResponse(data);
+			},
+			error: function () {
+				$("#responseMessage").html('<div class="alert alert-danger">Something went wrong.</div>');
+			}
+		});
+	});
+	function handleResponse(data){
+		console.log(data);
+		if (data.success) {
+			var responseMessage = document.getElementById("responseMessage");
+			responseMessage.classList.remove("valid-feedback", "invalid-feedback");
+			responseMessage.classList.add("valid-feedback");
+			responseMessage.innerText = data.message;
+			responseMessage.style.display = "block";
+
+			if(data.key){
+				setRememberMe(data.key);
+			}
+			setTimeout(function () {
+				window.location.href = "/Home/Index";
+			}, 1500);
+		} else {
+			var responseMessage = document.getElementById("responseMessage");
+			responseMessage.classList.remove("valid-feedback", "invalid-feedback");
+			responseMessage.classList.add("invalid-feedback");
+			responseMessage.innerText = data.message;
+			responseMessage.style.display = "block";
+		}
+	}
+	 document.addEventListener("DOMContentLoaded", function () {
+		let token = getRememberMe();
+
+		console.log(token);
+
+		if (token) {
+			fetch("/auth/ValidateToken", {
+				method: "POST",
+				headers: {
+					"Authorization": "Bearer " + token,
+					"Content-Type": "application/json"
+				}
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.isAuthenticated) {
+					console.log("User is logged in. ");
+					window.location.href = "/Home/index";
+				} else {
+					console.log("return false");
+					removeRememberMe();
+					window.location.href = "/auth/login";
+				}
+			})
+			.catch(() => {
+				removeRememberMe();
+				window.location.href = "/auth/login";
+			});
+		}
+	});
+</script>
