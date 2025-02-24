@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using BookStore.Filters;
 using Microsoft.AspNetCore.Mvc;
 using PRN222_Project_1.Models;
 
@@ -19,6 +20,10 @@ namespace PRN222_Project_1.Controllers
         }
 
         public IActionResult Privacy()
+        {
+            return View();
+        }
+        public IActionResult ErrorView()
         {
             return View();
         }

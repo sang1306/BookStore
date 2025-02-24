@@ -1,4 +1,9 @@
+using System.Net.Mail;
+using BookStore.Filters;
 using BookStore.Models;
+using BookStore.Services;
+using BookStore.Services.Jwt;
+using BookStore.Services.Mail;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +12,15 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<Prn222BookshopContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddTransient<AuthService>();
+builder.Services.AddTransient<MailService>();
+builder.Services.AddSingleton<IJwtService, JwtService>();
+builder.Services.AddScoped<AdminFilter>();
+
+
+// Add HttpContextAccessor
+builder.Services.AddHttpContextAccessor();
 
 // session config
 builder.Services.AddSession(options =>

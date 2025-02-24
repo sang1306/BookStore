@@ -18,7 +18,7 @@ namespace BookStore.Filters
             var userSession = UserSessionManager.GetUserInfo(httpContext);
             if (userSession == null)
             {
-                context.Result = new RedirectToActionResult("login", "auth", null);
+                context.Result = new RedirectToActionResult("index", "authentication", null);
                 return;
             }
         }

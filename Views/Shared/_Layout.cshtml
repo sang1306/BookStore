@@ -1,49 +1,127 @@
-﻿<!DOCTYPE html>
+﻿@using chat_application_demo.Utils
+@using BookStore.Enums
+@{
+	string logoIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='75' height='75' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-swatch-book'><path d='M11 17a4 4 0 0 1-8 0V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2Z' /><path d='M16.7 13H19a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H7' /><path d='M 7 17h.01' /><path d='m11 8 2.3-2.3a2.4 2.4 0 0 1 3.404.004L18.6 7.6a2.4 2.4 0 0 1 .026 3.434L9.9 19.8' /></svg>";
+	string cardIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='25' height='25' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-shopping-cart'><circle cx='8' cy='21' r='1' /><circle cx='19' cy='21' r='1' /><path d='M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12' /></svg>";
+	string wishListIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-cake-slice'><circle cx='9' cy='7' r='2' /><path d='M7.2 7.9 3 11v9c0 .6.4 1 1 1h16c.6 0 1-.4 1-1v-9c0-2-3-6-7-8l-3.6 2.6' /><path d='M16 13H3' /><path d='M16 17H3' /></svg>";
+
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - PRN222_Project_1</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/PRN222_Project_1.styles.css" asp-append-version="true" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - paperback </title>
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+	@* <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /> *@
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	@* <link rel="stylesheet" href="~/PRN222_Project_1.styles.css" asp-append-version="true" /> *@
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PRN222_Project_1</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - PRN222_Project_1 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+<body>
+	@if (UserSessionManager.GetUserInfo(ViewContext.HttpContext) != null){
+		@if (UserSessionManager.GetUserInfo(ViewContext.HttpContext).Role == (int)Roles.Admin){
+		
+		}
+		
+	}
+	else{
+		<nav class="navbar navbar-expand-lg  custom-navbar">
+			<div class="container">
+				<a class="navbar-brand" asp-action="Index" asp-controller="Home">
+					@Html.Raw(logoIcon) paperbacks
+				</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarNav">
+					<ul class="navbar-nav mx-auto">
+						<li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">Our Locations</a></li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="booksDropdown" role="button" data-bs-toggle="dropdown">
+								All Books
+							</a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item" href="#">Fiction</a></li>
+								<li><a class="dropdown-item" href="#">Non-Fiction</a></li>
+								<li><a class="dropdown-item" href="#">Children's Books</a></li>
+							</ul>
+						</li>
+						<li class="nav-item"><a class="nav-link" href="#">Book Exchange</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">Custom Order</a></li>
+
+						@if (UserSessionManager.GetUserInfo(ViewContext.HttpContext) != null)
+						{
+
+							<li class="nav-item"><a class="nav-link text-success" href="#">My Account</a></li>
+							<li class="nav-item">
+								<button class="btn btn-link text-success nav-link" onclick="handleSignOut()">Sign Out</button>
+							</li>
+							@* <li class="nav-item"><a class="nav-link text-success" asp-action="signout" asp-controller="authentication">SignOut</a></li> *@
+						}
+						else
+						{
+							<li class="nav-item"><a class="nav-link text-primary" asp-action="Index" asp-controller="Authentication">Login</a></li>
+						}
+
+					</ul>
+					<div class="d-flex">
+						<div class="icon-container">
+							<a href="#" class="nav-link">
+								@Html.Raw(cardIcon)
+								<span class="badge bg-success">0</span>
+							</a>
+						</div>
+						<div class="icon-container">
+							<a href="#" class="nav-link">
+								@Html.Raw(wishListIcon)
+								<span class="badge bg-success">0</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</nav>
+	}				
+	
+	@RenderBody()
+
+	<footer class="border-top footer text-muted" id="customFooter">
+		<div class="container">
+			<div class=" row text-center text-md-start">
+				@* logo *@
+				<div class="col-md-3 m-4 textFooter">
+					@Html.Raw(logoIcon)
+					<p class="mt-2 textFooter">2022 All rights reserved</p>
+					<div class="social-icons textFooter">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
+					</div>
+				</div>
+				<div class="col-md-6 m-4 textFooter row">
+					<div class="fw-bold fs-3">Navigation</div>
+					<a class="textFooter link" href="">Home</a>
+					<a class="textFooter link">About us</a>
+					<a class="textFooter link">Shop</a>
+					<a class="textFooter link">Blog</a>
+					<a class="textFooter link">Custom Order</a>
+					<a class="textFooter link">Book Review</a>
+				</div>
+			</div>
+
+		</div>
+
+
+
+	</footer>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -3,13 +3,36 @@
 @{
     ViewData["Title"] = "Index";
 }
+<style>
+    .sidebar {
+        background-color: #87CEEB; /* Màu xanh da trời */
+        height: 100vh;
+        padding-top: 20px;
+    }
 
-<h1>Index</h1>
+        .sidebar .nav-link {
+            color: #fff; /* Màu chữ trắng */
+            text-align: center;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+            .sidebar .nav-link:hover {
+                background-color: #4682B4; /* Màu xanh dương đậm hơn khi hover */
+            }
+
+            .sidebar .nav-link.active {
+                background-color: #1E90FF; /* Màu xanh da trời đậm khi được chọn */
+            }
+
+
+</style>
 
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar">
             <div class="position-sticky">
                 <ul class="nav flex-column">
                     <li class="nav-item">
@@ -22,17 +45,19 @@
                             <i class="fas fa-users"></i> ManageUser
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="Create">
+                            <i class="fas fa-users"></i> Add new User
+                        </a>
+                    </li>
+                    
                 </ul>
             </div>
         </nav>
 
         <!-- Main content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div class="d-flex justify-content-between mb-3">
-                <a asp-action="Create" class="btn btn-primary">
-                    <i class="fas fa-user-plus"></i> Add new 
-                </a>
-            </div>
+            
 
             <div class="card shadow">
                 <div class="card-body">
@@ -42,7 +67,6 @@
                                 <th>Id</th>
                                 <th>UserName</th>
                                 <th>Email</th>
-                                <th>Preferences</th>
                                 <th>CreatAt</th>
                                 <th>Address</th>
                                 <th>Status</th>
@@ -50,26 +74,16 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody >
                             @foreach (var item in Model)
                             {
                                 <tr>
                                     <td>@Html.DisplayFor(modelItem => item.UserId)</td>
                                     <td>@Html.DisplayFor(modelItem => item.Username)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.Email)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.Preferences)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Email)</td>                                   
                                     <td>@Html.DisplayFor(modelItem => item.CreateAt)</td>
                                     <td>@Html.DisplayFor(modelItem => item.Address)</td>
-                                    <td>
-                                        @if (item.Status == 1)
-                                        {
-                                            <span class="badge bg-success">Active</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-danger">Locked</span>
-                                        }
-                                    </td>
+                                    <td>@Html.DisplayFor(modelItem => item.Status)</td>
                                     <td>@Html.DisplayFor(modelItem => item.RoleNavigation.RoleName)</td>
                                     <td>
                                         <a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-sm btn-warning">
@@ -133,3 +147,4 @@
         </main>
     </div>
 </div>
+
