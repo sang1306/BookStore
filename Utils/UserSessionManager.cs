@@ -1,7 +1,7 @@
 ﻿using BookStore.Models;
 using Newtonsoft.Json;
 
-namespace chat_application_demo.Utils
+namespace BookStore.Utils
 {
     public static class UserSessionManager
     {

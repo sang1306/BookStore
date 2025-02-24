@@ -7,7 +7,7 @@ using BookStore.Models;
 using BookStore.Services.Jwt;
 using BookStore.Services.Mail;
 using BookStore.Utils;
-using chat_application_demo.Utils;
+using BookStore.Utils;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;

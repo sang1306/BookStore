@@ -2,7 +2,7 @@
 using BookStore.Dtos.UserDto;
 using BookStore.Models;
 using BookStore.Services;
-using chat_application_demo.Utils;
+using BookStore.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
