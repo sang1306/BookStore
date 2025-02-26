@@ -1,6 +1,7 @@
 using System.Net.Mail;
 using BookStore.Models;
 using BookStore.Services;
+using BookStore.Services.Book;
 using BookStore.Services.Jwt;
 using BookStore.Services.Mail;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ builder.Services.AddTransient<AuthService>();
 builder.Services.AddTransient<MailService>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
 
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 // Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
 
