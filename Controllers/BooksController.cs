@@ -1,5 +1,6 @@
 ﻿using BookStore.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
@@ -86,18 +87,6 @@ namespace BookStore.Controllers
             return RedirectToAction("Index");
         }
 
-        // hiển thị danh sách các sách
-        //[HttpGet]
-        //[Route("addBook")]
-        //public async Task<IActionResult> AddBook()
-        //{
-        //    ViewBag.Categories = _context.Categories.ToList();
-        //    var books = await _context.Books
-        //                          .Include(b => b.Category) 
-        //                          .ToListAsync();
-        //    return View(books);
-        //}
-
 
         [HttpGet]
         public async Task<IActionResult> AddBook(string searchTitle, int? categoryId, string sortOrder, int page = 1)
@@ -137,7 +126,7 @@ namespace BookStore.Controllers
                     break;
             }
 
-            books= books.OrderByDescending(b => b.BookId);
+            books = books.OrderByDescending(b => b.BookId);
 
             // 📖 Pagination - Phân trang
             var pagedBooks = await books.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
@@ -150,9 +139,6 @@ namespace BookStore.Controllers
 
             return View(pagedBooks);
         }
-
-
-
 
         //hàm lưu ảnh và trả về đường dẫn
         private async Task<string> SaveImageAsync(IFormFile imageFile)
@@ -189,7 +175,7 @@ namespace BookStore.Controllers
         [Route("addNewBook")]
         public async Task<IActionResult> AddNewBook(Book book, IFormFile ImageFile)
         {
-           
+
 
             try
             {
@@ -222,7 +208,7 @@ namespace BookStore.Controllers
 
                 ViewBag.Categories = _context.Categories.ToList();
                 //return View("AddBook", updatedBooks); // Trả về view với danh sách sách đã cập nhật
-                return RedirectToAction("AddBook","Books" );
+                return RedirectToAction("AddBook", "Books");
             }
             catch (Exception ex)
             {
@@ -237,7 +223,7 @@ namespace BookStore.Controllers
 
                 ViewBag.Categories = _context.Categories.ToList();
                 //return View("AddBook", currentBooks); // Trả về view với danh sách sách hiện tại
-                return RedirectToAction("AddBook","Books" );
+                return RedirectToAction("AddBook", "Books");
             }
         }
 
@@ -318,7 +304,26 @@ namespace BookStore.Controllers
         }
 
 
-        
+        //---------------------------------- 
+        [HttpGet("Details/{id}")]
+        public async Task<IActionResult> BookDetail(int id)
+        {
+            var book = await _context.Books.FindAsync(id);
+            ViewBag.book = book;
+            ViewBag.Books = await GetRandomBooksAsync(3);
+            return View();
+        }
+
+        private async Task<List<Book>> GetRandomBooksAsync(int count = 4)
+        {
+            return await _context.Books
+                .OrderBy(x => Guid.NewGuid())
+                .Take(count)
+                .ToListAsync();
+        }
+
+
+
 
     }
 }

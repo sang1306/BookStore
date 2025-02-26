@@ -1,0 +1,91 @@
+﻿@{
+}
+<style>
+	.img-set {
+		width: 100%;
+		height: auto;
+		object-fit: cover;
+	}
+
+</style>
+<div class="container mt-5">
+	<div class="row">
+		<!-- Left column - Book image -->
+		<div class="col-md-5">
+			<div class="position-relative mb-3">
+				@* <span class="badge bg-success text-white position-absolute" style="top: 0; left: 0; padding: 8px 15px;">HARDCOVER</span> *@
+				<div class="">
+					<img src="@ViewBag.book.Image" alt="Vinyl Me, Please: 100 Albums You Need in Your Collection" class="img-set">
+				</div>
+			</div>
+		</div>
+
+		<!-- Right column - Book details -->
+		<div class="col-md-7">
+			<div class="d-flex justify-content-between align-items-start">
+				<h1 class="display-5 fw-bold text-dark mb-4">@ViewBag.book.Title </h1>
+				<button class="btn btn-outline-secondary rounded-circle border-0">
+					<i class="bi bi-heart"></i>
+				</button>
+			</div>
+
+			<div class="book-details mb-4">
+				<p class="mb-1">ISBN: 9781419725975 | 256 Pages | Hardcover | Publisher: Abrams Image</p>
+				<h5 class="mb-4">@ViewBag.book.Author</h5>
+
+				<p class="mb-2">@ViewBag.book.Description</p>
+				<div class="price-section mb-3">
+					<h3 class="fw-bold">@ViewBag.book.Price</h3>
+				</div>
+
+				@if (ViewBag.book.Stock == 0)
+				{
+					<div class="availability-section mb-3">
+						<div class="bg-light text-center p-2 d-inline-block">
+							Out Of Stock
+						</div>
+						<p class="mt-2">This book is currently out of stock. You can custom order it <a href="#" class="text-success">here!</a></p>
+					</div>
+				}
+				else
+				{
+					<div class="availability-section mb-3">
+						<div class="bg-light text-center p-2 d-inline-block">
+							Stock: @ViewBag.book.Stock
+						</div>
+					</div>
+				}
+				<form class="flex" style="display: flex; gap:10px; ">
+					<input class="form-control" style="width:100px" type="number" name="numOfBooks" />
+					<input class="form-control  btn btn-secondary" type="submit" value="Add To Card" />
+				</form>
+			</div>
+		</div>
+
+		<div style="font-size:30px; font-weight:bold">You might also like</div>
+		<div id="container01">
+			<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4  g-4 gap-3 mt-2"
+				 style="display: flex; justify-content:center">
+				@* @for (int i = 1; i <= 6; i++) *@
+				@foreach (BookStore.Models.Book b in ViewBag.Books)
+				{
+					<div class="col card-container">
+						<div class="card h-100 border-0" style="width: 18rem;">
+							<div style="overflow: hidden;">
+								<img src="@b.Image" class="card-img-top z-0" alt="...">
+							</div>
+							<div class="card-body">
+								<h5 class="card-title">@b.Title</h5>
+								<p class="card-text">@b.Author</p>
+								<p class="">@b.Price ₫</p>
+								<a asp-action="BookDetail" asp-controller="Books" asp-route-id="@b.BookId" class="btn btn-primary">Read More</a>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+
+
+	</div>
+</div>
