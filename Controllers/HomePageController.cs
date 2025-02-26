@@ -108,8 +108,5 @@ namespace BookStore.Controllers
                 .Take(count)  // Chọn 4 cuốn sách
                 .ToListAsync();
         }
-
-
-
     }
 }
