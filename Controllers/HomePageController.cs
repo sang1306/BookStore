@@ -25,7 +25,7 @@ namespace BookStore.Controllers
 
         //view sách
         [HttpGet]
-        [Route("ListBook")]
+        [Route("/Books/ListBook")]
         public async Task<IActionResult> ListBookAsync(string searchTitle, int? categoryId, string sortOrder, int page = 1)
         {
             int pageSize = 12; // Số sách trên mỗi trang
