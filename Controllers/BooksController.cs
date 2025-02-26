@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace BookStore.Controllers
 {
-    [Route("/Admin")]
-    public class AdminController : Controller
+    [Route("/Books")]
+    public class BooksController : Controller
     {
         private readonly Prn222BookshopContext _context;
         private readonly IWebHostEnvironment _env;
@@ -16,7 +16,7 @@ namespace BookStore.Controllers
             set => HttpContext.Session.SetInt32("CurrentPage", value);
         }
 
-        public AdminController(Prn222BookshopContext context, IWebHostEnvironment env)
+        public BooksController(Prn222BookshopContext context, IWebHostEnvironment env)
         {
             _context = context;
             _env = env;
@@ -137,6 +137,8 @@ namespace BookStore.Controllers
                     break;
             }
 
+            books= books.OrderByDescending(b => b.BookId);
+
             // 📖 Pagination - Phân trang
             var pagedBooks = await books.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
@@ -219,7 +221,8 @@ namespace BookStore.Controllers
                                               .ToListAsync();
 
                 ViewBag.Categories = _context.Categories.ToList();
-                return View("AddBook", updatedBooks); // Trả về view với danh sách sách đã cập nhật
+                //return View("AddBook", updatedBooks); // Trả về view với danh sách sách đã cập nhật
+                return RedirectToAction("AddBook","Books" );
             }
             catch (Exception ex)
             {
@@ -233,7 +236,8 @@ namespace BookStore.Controllers
                                                .ToListAsync();
 
                 ViewBag.Categories = _context.Categories.ToList();
-                return View("AddBook", currentBooks); // Trả về view với danh sách sách hiện tại
+                //return View("AddBook", currentBooks); // Trả về view với danh sách sách hiện tại
+                return RedirectToAction("AddBook","Books" );
             }
         }
 
