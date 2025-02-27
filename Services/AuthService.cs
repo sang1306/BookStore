@@ -73,6 +73,7 @@ namespace BookStore.Services
             {
                 Success = false,
                 Message = "Invalid username!",
+                Role = user.Role
             };
 
         }

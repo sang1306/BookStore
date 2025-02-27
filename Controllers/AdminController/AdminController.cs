@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using X.PagedList.Extensions;
 using X.PagedList;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BookStore.Controllers.AdminController
 {
+    
     public class AdminController : Controller
     {
         private readonly Prn222BookshopContext _context;
@@ -16,9 +18,12 @@ namespace BookStore.Controllers.AdminController
             _context = context;
         }
 
-        // GET: Admin
+       
+        
         public async Task<IActionResult> Index(int? page)
         {
+           
+
             int pageNumber = (page ?? 1); 
             int pageSize = 8;
 
@@ -27,23 +32,7 @@ namespace BookStore.Controllers.AdminController
             var pagedUsers = users.ToPagedList(pageNumber, pageSize);
             return View(pagedUsers);
         }
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.Users
-                .Include(u => u.RoleNavigation)
-                .FirstOrDefaultAsync(m => m.UserId == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return View(user);
-        }
+        
 
         public IActionResult Create()
         {
@@ -55,22 +44,22 @@ namespace BookStore.Controllers.AdminController
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UserId,Username,Password,Email,Role,Preferences,CreateAt,Address,Status")] User user)
         {
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
-            }
+            //}
             ViewData["Role"] = new SelectList(_context.Roles, "RoleId", "RoleId", user.Role);
             return View(user);
         }
 
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            //if (id == null)
+            //{
+            //    return NotFound();
+            //}
 
             var user = await _context.Users.FindAsync(id);
             if (user == null)
@@ -79,6 +68,7 @@ namespace BookStore.Controllers.AdminController
             }
             ViewData["Role"] = new SelectList(_context.Roles, "RoleId", "RoleId", user.Role);
             return View(user);
+
         }
 
         [HttpPost]
@@ -90,8 +80,8 @@ namespace BookStore.Controllers.AdminController
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 try
                 {
                     _context.Update(user);
@@ -109,12 +99,13 @@ namespace BookStore.Controllers.AdminController
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
+            //}
             ViewData["Role"] = new SelectList(_context.Roles, "RoleId", "RoleId", user.Role);
             return View(user);
+
         }
 
-       
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

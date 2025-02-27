@@ -1,8 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using BookStore.Dtos.UserDto;
 using BookStore.Models;
 using BookStore.Services;
 using chat_application_demo.Utils;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,6 +34,22 @@ namespace BookStore.Controllers
         public async Task<IActionResult> Login(UserLoginRequest login)
         {
             UserLoginResponse response = await _userService.UserLogin(login, HttpContext);
+            //if (response == null || !response.Success)
+            //{
+            //    return Unauthorized(new { message = "Sai tài khoản hoặc mật khẩu" });
+            //}
+
+            //var claims = new List<Claim>
+            //{
+            //new Claim(ClaimTypes.Name, response.Username),
+            //new Claim(ClaimTypes.Role, response.Role.ToString())
+            //};
+
+            //var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            //var authProperties = new AuthenticationProperties { IsPersistent = true };
+
+            //await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+            //    new ClaimsPrincipal(claimsIdentity), authProperties);
             return Json(response);
         }
 
