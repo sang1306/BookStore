@@ -5,6 +5,7 @@ using X.PagedList.Extensions;
 using X.PagedList;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
+using chat_application_demo.Utils;
 
 namespace BookStore.Controllers.AdminController
 {
@@ -22,12 +23,16 @@ namespace BookStore.Controllers.AdminController
         
         public async Task<IActionResult> Index(int? page)
         {
-           
-
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 3)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             int pageNumber = (page ?? 1); 
             int pageSize = 8;
 
             var users = await _context.Users.Include(u => u.RoleNavigation).ToListAsync();
+            
 
             var pagedUsers = users.ToPagedList(pageNumber, pageSize);
             return View(pagedUsers);
@@ -36,6 +41,11 @@ namespace BookStore.Controllers.AdminController
 
         public IActionResult Create()
         {
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 3)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             ViewData["Role"] = new SelectList(_context.Roles, "RoleId", "RoleId");
             return View();
         }
@@ -44,9 +54,14 @@ namespace BookStore.Controllers.AdminController
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UserId,Username,Password,Email,Role,Preferences,CreateAt,Address,Status")] User user)
         {
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 3)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             //if (ModelState.IsValid)
             //{
-                _context.Add(user);
+            _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             //}
@@ -60,7 +75,11 @@ namespace BookStore.Controllers.AdminController
             //{
             //    return NotFound();
             //}
-
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 3)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
@@ -75,6 +94,11 @@ namespace BookStore.Controllers.AdminController
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("UserId,Username,Password,Email,Role,Preferences,CreateAt,Address,Status")] User user)
         {
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 3)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             if (id != user.UserId)
             {
                 return NotFound();
@@ -108,6 +132,11 @@ namespace BookStore.Controllers.AdminController
 
         public async Task<IActionResult> Delete(int? id)
         {
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 3)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             if (id == null)
             {
                 return NotFound();
@@ -129,6 +158,11 @@ namespace BookStore.Controllers.AdminController
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 3)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             var user = await _context.Users.FindAsync(id);
             if (user != null)
             {
