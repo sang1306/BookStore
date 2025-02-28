@@ -1,0 +1,169 @@
+﻿@model X.PagedList.IPagedList<BookStore.Models.User>
+@using X.PagedList.Mvc.Core
+@{
+	ViewData["Title"] = "Index";
+}
+<style>
+	.sidebar {
+		background-color: #87CEEB; /* Màu xanh da trời */
+		height: 100vh;
+		padding-top: 20px;
+	}
+
+		.sidebar .nav-link {
+			color: #fff; /* Màu chữ trắng */
+			text-align: center;
+			padding: 15px;
+			border-radius: 5px;
+			font-weight: bold;
+		}
+
+			.sidebar .nav-link:hover {
+				background-color: #4682B4; /* Màu xanh dương đậm hơn khi hover */
+			}
+
+			.sidebar .nav-link.active {
+				background-color: #1E90FF; /* Màu xanh da trời đậm khi được chọn */
+			}
+
+	.nav-item .btn-signout {
+		background: none;
+		border: none;
+		color: #dc3545; /* Màu đỏ tương tự như nút sign-out */
+		padding: 0;
+		font-size: 1rem;
+		cursor: pointer;
+		text-decoration: none; /* Loại bỏ gạch chân */
+		transition: color 0.3s ease-in-out;
+	}
+
+		.nav-item .btn-signout:hover {
+			color: #a71d2a; /* Màu đỏ đậm hơn khi hover */
+		}
+
+</style>
+
+<div class="container-fluid">
+	<div class="row">
+		<!-- Sidebar -->
+		<nav class="col-md-3 col-lg-2 d-md-block sidebar">
+			<div class="position-sticky">
+				<ul class="nav flex-column">
+					<li class="nav-item">
+						<a class="nav-link active" href="#">
+							<i class="fas fa-tachometer-alt"></i> Dashboard
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#">
+							<i class="fas fa-users"></i> ManageUser
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" asp-controller="Admin" asp-action="Create">
+							<i class="fas fa-users"></i> Add new User
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link text-danger" href="javascript:void(0);" onclick="handleSignOut()">
+							<i class="fas fa-sign-out-alt"></i> Sign Out
+						</a>
+					</li>
+
+				</ul>
+			</div>
+		</nav>
+
+		<!-- Main content -->
+		<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+
+
+			<div class="card shadow">
+				<div class="card-body">
+					<table class="table table-hover">
+						<thead class="table-dark">
+							<tr>
+								<th>Id</th>
+								<th>UserName</th>
+								<th>Email</th>
+								<th>CreatAt</th>
+								<th>Address</th>
+								<th>Status</th>
+								<th>Role</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var item in Model)
+							{
+								<tr>
+									<td>@Html.DisplayFor(modelItem => item.UserId)</td>
+									<td>@Html.DisplayFor(modelItem => item.Username)</td>
+									<td>@Html.DisplayFor(modelItem => item.Email)</td>
+									<td>@Html.DisplayFor(modelItem => item.CreateAt)</td>
+									<td>@Html.DisplayFor(modelItem => item.Address)</td>
+									<td>@Html.DisplayFor(modelItem => item.Status)</td>
+									<td>@Html.DisplayFor(modelItem => item.RoleNavigation.RoleName)</td>
+									<td>
+										<a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-sm btn-warning">
+											<i class="fas fa-edit"></i> Edit
+										</a>
+										<a asp-action="Delete" asp-route-id="@item.UserId" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa?');">
+											<i class="fas fa-trash"></i> Delete
+										</a>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+					<div class="d-flex justify-content-center">
+						<ul class="pagination">
+							@if (Model.HasPreviousPage)
+							{
+								<li class="page-item">
+									<a class="page-link" href="@Url.Action("Index", new { page = Model.PageNumber - 1 })">
+										<i class="fas fa-chevron-left"></i>
+									</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled">
+									<span class="page-link">
+										<i class="fas fa-chevron-left"></i>
+									</span>
+								</li>
+							}
+
+							<!-- Hiển thị các số trang -->
+							@for (var i = 1; i <= Model.PageCount; i++)
+							{
+								<li class="page-item @(i == Model.PageNumber ? "active" : "")">
+									<a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+								</li>
+							}
+
+							@if (Model.HasNextPage)
+							{
+								<li class="page-item">
+									<a class="page-link" href="@Url.Action("Index", new { page = Model.PageNumber + 1 })">
+										<i class="fas fa-chevron-right"></i>
+									</a>
+								</li>
+							}
+							else
+							{
+								<li class="page-item disabled">
+									<span class="page-link">
+										<i class="fas fa-chevron-right"></i>
+									</span>
+								</li>
+							}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</div>
+
