@@ -2,6 +2,7 @@
 using BookStore.Filters;
 using BookStore.Models;
 using BookStore.Services;
+using BookStore.Services.Book;
 using BookStore.Services.Jwt;
 using BookStore.Services.Mail;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -20,6 +21,7 @@ builder.Services.AddSingleton<IJwtService, JwtService>();
 builder.Services.AddScoped<AdminFilter>();
 
 
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 // Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
 
