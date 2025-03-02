@@ -1,0 +1,38 @@
+﻿@page
+@model BookStore.Pages.User.IndexModel
+@{
+    ViewData["Title"] = "Thông tin  người dùng";
+}
+
+<h2>Thông tin người dùng</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>UserId</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Preferences</th>
+            <th>Address</th>
+            <th>Status</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.Users)
+        {
+            <tr>
+                
+                <td>@user.UserId</td>
+                <td>@user.Username</td>
+                <td>@user.Email</td>
+                <td>@user.Role</td>
+                <td>@user.Preferences</td>
+                <td>@user.Address</td>
+                <td>@user.Status</td>
+
+            </tr>
+        }
+    </tbody>
+</table>
