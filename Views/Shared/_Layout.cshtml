@@ -51,10 +51,7 @@
 
 					@if (UserSessionManager.GetUserInfo(ViewContext.HttpContext) != null)
 					{
-					
-						var userinfor = UserSessionManager.GetUserInfo(ViewContext.HttpContext);
-						
-						<li class="nav-item"><a class="nav-link text-success" asp-action="UserProfile" asp-controller="User" asp-route-id="@userinfor.UserId">My Account</a></li>						
+						<li class="nav-item"><a class="nav-link text-success" asp-action="UserProfile" asp-controller="User" asp-route-id="@Model.UserId">My Account</a></li>						
 
 						<li class="nav-item">
 							<button class="btn btn-link text-success nav-link" onclick="handleSignOut()">Sign Out</button>
