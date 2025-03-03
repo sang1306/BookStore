@@ -1,6 +1,8 @@
 ﻿using BookStore.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace BookStore.Controllers
 {
@@ -54,19 +56,29 @@ namespace BookStore.Controllers
 			user.Address = model.Address;
 			user.Status = model.Status;
 
-            try
-            {
-                prn222BookshopContext.Users.Update(user);
-                await prn222BookshopContext.SaveChangesAsync();
-                return RedirectToAction("UserProfile", new { id = user.UserId });
-            }
-            catch (Exception ex)
-            {
-               
-                ModelState.AddModelError("", "Error saving data: " + ex.Message);
-                return View(model);
-            }
+			try
+			{
+				await prn222BookshopContext.SaveChangesAsync();
+				_logger.LogInformation("Password updated successfully for UserId: {UserId}", user.UserId);
+				return RedirectToAction("UserProfile", new { id = user.UserId });
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError("Error updating password: {Message}", ex.Message);
+				ModelState.AddModelError("", "Error saving data: " + ex.Message);
+				return View(model);
+			}
 
+
+		}
+
+		private string HashPassword(string password)
+		{
+			using (var sha256 = SHA256.Create())
+			{
+				var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+				return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+			}
 		}
 
 	}

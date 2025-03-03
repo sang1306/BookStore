@@ -1,0 +1,56 @@
+﻿@using BookStore.Models
+@model User
+
+@{
+    ViewData["Title"] = "My Wishlist";
+}
+
+<h2 class="text-center">My Wishlist</h2>
+
+@if (Model.Books != null && Model.Books.Any())
+{
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var book in Model.Books)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    <img src="@book.Image" class="card-img-top" alt="@book.Title" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">@book.Title</h5>
+                        <p class="card-text"><strong>Author:</strong> @book.Author</p>
+                        <p class="card-text"><strong>Price:</strong> @book.Price ₫</p>
+                        <form method="post" asp-action="RemoveFromWishlist" asp-controller="Wishlist">
+                            <input type="hidden" name="bookId" value="@book.BookId" />
+                            <button type="button" class="btn btn-danger" onclick="removeFromWishlist(@book.BookId, this)">Remove</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="text-center">No books in your wishlist.</p>
+}
+<script>
+    function removeFromWishlist(bookId, element) {
+        fetch('/Wishlist/RemoveFromWishlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'bookId=' + bookId
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); 
+                if (data.success) {
+                    alert(data.message); 
+                    element.closest('.col').remove(); 
+                } else {
+                    alert(data.message || "Error occurred!"); 
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+
