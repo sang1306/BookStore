@@ -102,10 +102,10 @@
 				data: form.serialize(), // serializes the form's elements
 				success: function(response) {
 					if(response.success) {
-
-						$("#cart-count").text(response.cartCount);
+						// $("#cart-count").text(response.cartCount);
 						alert("Item added to cart successfully!");
 						$("input[name='quantity']").val(1);
+						loadCartCount();
 					}
 				}
 			});

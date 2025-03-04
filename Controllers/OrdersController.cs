@@ -110,7 +110,7 @@ namespace BookStore.Controllers
             var cookieOptions = new CookieOptions
             {
                 Expires = DateTime.Now.AddDays(30),
-                HttpOnly = true,
+                HttpOnly = false,
             };
 
             // Update cookie
@@ -146,7 +146,7 @@ namespace BookStore.Controllers
             var cookieOptions = new CookieOptions
             {
                 Expires = DateTime.Now.AddDays(30),
-                HttpOnly = true,
+                HttpOnly = false,
             };
 
             // Update cookie
@@ -193,7 +193,7 @@ namespace BookStore.Controllers
             var cookieOptions = new CookieOptions
             {
                 Expires = DateTime.Now.AddDays(30),
-                HttpOnly = true,
+                HttpOnly = false,
             };
 
             // Update cookie
