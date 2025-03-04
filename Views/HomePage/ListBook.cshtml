@@ -1,93 +1,67 @@
 ﻿@model List<BookStore.Models.Book>
 
 
-<!DOCTYPE html>
-<html lang="en">
+<style>
+	.card-product-grid {
+		display: flex;
+		flex-direction: column;
+		height: 100%; /* Đảm bảo các card có chiều cao giống nhau */
+	}
 
-<head>
-	<title>BookSaw - Free Book Store HTML CSS Template</title>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="format-detection" content="telephone=no">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="author" content="">
-	<meta name="keywords" content="">
-	<meta name="description" content="">
+	.img-wrap {
+		height: 250px; /* Đặt chiều cao cố định cho ảnh */
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+	}
 
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-	integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-
-	<link rel="stylesheet" type="text/css" href="~/css/normalize.css">
-	<link rel="stylesheet" type="text/css" href="~/css/style.css">
-	<link rel="stylesheet" type="text/css" href="~/css/vendor.css">
-
-	<style>
-		<style >
-		.card-product-grid {
-			display: flex;
-			flex-direction: column;
-			height: 100%; /* Đảm bảo các card có chiều cao giống nhau */
+		.img-wrap img {
+			max-height: 100%;
+			max-width: 100%;
+			object-fit: cover; /* Đảm bảo ảnh không bị méo */
 		}
 
-		.img-wrap {
-			height: 250px; /* Đặt chiều cao cố định cho ảnh */
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			overflow: hidden;
-		}
+	.info-wrap {
+		flex-grow: 1; /* Giúp phần thông tin mở rộng để căn chỉnh */
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
 
-			.img-wrap img {
-				max-height: 100%;
-				max-width: 100%;
-				object-fit: cover; /* Đảm bảo ảnh không bị méo */
-			}
+	.fix-height {
+		min-height: 60px; /* Đảm bảo tiêu đề có chiều cao đồng đều */
+	}
 
-		.info-wrap {
-			flex-grow: 1; /* Giúp phần thông tin mở rộng để căn chỉnh */
-			display: flex;
-			flex-direction: column;
-			justify-content: space-between;
-		}
+	.btn-primary {
+		margin-top: auto; /* Đẩy nút "Add to cart" xuống đáy */
+	}
 
-		.fix-height {
-			min-height: 60px; /* Đảm bảo tiêu đề có chiều cao đồng đều */
-		}
+	.title {
+		display: -webkit-box;
+		-webkit-line-clamp: 3; /* Giới hạn tối đa 3 dòng */
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		height: 4.5em; /* Đặt chiều cao cố định (mỗi dòng khoảng 1.5em) */
+		line-height: 1.5em; /* Đảm bảo mỗi dòng có cùng chiều cao */
+	}
 
-		.btn-primary {
-			margin-top: auto; /* Đẩy nút "Add to cart" xuống đáy */
-		}
-		.title {
-			display: -webkit-box;
-			-webkit-line-clamp: 3; /* Giới hạn tối đa 3 dòng */
-		    -webkit-box-orient: vertical;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			height: 4.5em; /* Đặt chiều cao cố định (mỗi dòng khoảng 1.5em) */
-			line-height: 1.5em; /* Đảm bảo mỗi dòng có cùng chiều cao */
-		}
+	aside {
+		position: sticky;
+		top: 20px; /* Cách mép trên 20px */
+		height: fit-content;
+	}
 
-		aside {
-			position: sticky;
-			top: 20px; /* Cách mép trên 20px */
-			height: fit-content;
-		}
+</style>
 
-
-
-
-	</style>
-</head>
-
-<body data-bs-spy="scroll" data-bs-target="#header" tabindex="0">
 
 
 
 	<section id="popular-books" class="bookshelf py-5 my-5">
 		<div class="container">
 			<div class="row">
-				@* filter *@
+					@* filter *@
 				<aside class="col-md-3">
 					<div class="card p-3">
 						<h5 class="card-title">Filter Books</h5>
@@ -103,12 +77,12 @@
 								<label for="categoryId" class="form-label">Category</label>
 								<select class="form-select" id="categoryId" name="categoryId">
 									<option value="">All Categories</option>
-									@foreach (var category in ViewBag.Categories)
-									{
+										@foreach (var category in ViewBag.Categories)
+										{
 										<option value="@category.CategoryId" selected="@(ViewBag.CategoryId == category.CategoryId ? "selected" : null)">
-											@category.CategoryName
+												@category.CategoryName
 										</option>
-									}
+										}
 								</select>
 							</div>
 
@@ -135,13 +109,13 @@
 					<header class="border-bottom mb-4 pb-3">
 						<div class="form-inline">
 							<span class="mr-md-auto">@Model.Count Items found </span>
-							
+
 						</div>
 					</header><!-- sect-heading -->
-					@* book list *@
+						@* book list *@
 					<div class="row">
-						@foreach (var book in Model)
-						{
+							@foreach (var book in Model)
+							{
 							<div class="col-md-3">
 								<figure class="card card-product-grid ">
 									<div class="img-wrap">
@@ -163,11 +137,11 @@
 									</figcaption>
 								</figure>
 							</div> <!-- col.// -->
-						}
-						
+							}
 
 
-					
+
+
 
 						<!-- 🔄 Pagination -->
 						<nav class="mt-4" aria-label="Page navigation">
@@ -178,12 +152,12 @@
 								</li>
 
 								<!-- Số trang -->
-								@for (int i = 1; i <= ViewBag.TotalPages; i++)
-								{
+									@for (int i = 1; i <= ViewBag.TotalPages; i++)
+									{
 									<li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
 										<a class="page-link" href="@Url.Action("ListBook", new { searchTitle = ViewBag.SearchTitle, categoryId = ViewBag.CategoryId, sortOrder = ViewData["SortOrder"], page = i })">@i</a>
 									</li>
-								}
+									}
 
 								<!-- Nút Next -->
 								<li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
@@ -359,13 +333,10 @@
 		</div>
 	</div>
 
-	<script src="js/jquery-1.11.0.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
-			integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
-			crossorigin="anonymous"></script>
-	<script src="js/plugins.js"></script>
-	<script src="js/script.js"></script>
+	@* <script src="js/jquery-1.11.0.min.js"></script> *@
+	@* <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" *@
+	@* 		integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" *@
+	@* 		crossorigin="anonymous"></script> *@
+	@* <script src="js/plugins.js"></script> *@
+	@* <script src="js/script.js"></script> *@
 
-</body>
-
-</html>

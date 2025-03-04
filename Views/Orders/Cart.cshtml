@@ -57,16 +57,20 @@
 							</tr>
 						</thead>
 						<tbody>
-							@foreach (BookStore.Models.Book b in ViewBag.CartBooks)
+							@foreach (BookStore.Controllers.CartItemDetails item in ViewBag.CartBooks)
 							{
+								var book = item.Book;
+								var quantity = item.Quantity;
+
 								<tr>
 									<td class="align-middle">
-										<img src="https://via.placeholder.com/80x100" alt="Book cover" class="cart-thumbnail">
+										<img src="@book.Image"
+											 alt="Book cover" class="cart-thumbnail">
 									</td>
-									<td class="align-middle">@b.Title</td>
-									<td class="align-middle">@b.Price ₫</td>
+									<td class="align-middle">@book.Title</td>
+									<td class="align-middle">@book.Price ₫</td>
 									<td class="align-middle">
-										<input type="number" class="form-control quantity-input" value="1" min="1">
+										<input type="number" class="form-control quantity-input" value="@quantity" min="1">
 									</td>
 									<td class="align-middle">395,000 ₫</td>
 									<td class="align-middle text-center">
@@ -74,37 +78,6 @@
 									</td>
 								</tr>
 							}
-
-							<!-- First Item -->
-							<tr>
-								<td class="align-middle">
-									<img src="https://via.placeholder.com/80x100" alt="Book cover" class="cart-thumbnail">
-								</td>
-								<td class="align-middle">The Color of Water: A Black Man's Tribute to His White Mother</td>
-								<td class="align-middle">395,000 ₫</td>
-								<td class="align-middle">
-									<input type="number" class="form-control quantity-input" value="1" min="1">
-								</td>
-								<td class="align-middle">395,000 ₫</td>
-								<td class="align-middle text-center">
-									<i class="bi bi-x-lg remove-item"></i>
-								</td>
-							</tr>
-							<!-- Second Item -->
-							<tr>
-								<td class="align-middle">
-									<img src="https://via.placeholder.com/80x100" alt="Book cover" class="cart-thumbnail">
-								</td>
-								<td class="align-middle">When Bad Things Happen to Good People</td>
-								<td class="align-middle">345,000 ₫</td>
-								<td class="align-middle">
-									<input type="number" class="form-control quantity-input" value="2" min="1">
-								</td>
-								<td class="align-middle">690,000 ₫</td>
-								<td class="align-middle text-center">
-									<i class="bi bi-x-lg remove-item"></i>
-								</td>
-							</tr>
 						</tbody>
 					</table>
 				</div>
@@ -115,14 +88,6 @@
 				<input type="text" class="form-control " placeholder="Coupon Code" style="width: 40%">
 				<button class="btn btn-success" type="button">Apply Coupon</button>
 			</div>
-
-			<!-- Coupon Section -->
-			@* <div class=" mt-4 mb-3"> *@
-			@* <div class="input-group coupon-input m-0"> *@
-			@* <input type="text" class="form-control " placeholder="Coupon Code" style=""> *@
-			@* <button class="btn btn-success" type="button">Apply Coupon</button> *@
-			@* </div> *@
-			@* </div> *@
 
 			<!-- Return to Shop Button -->
 			<div class="mt-4">
