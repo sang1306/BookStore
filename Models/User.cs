@@ -7,8 +7,6 @@ public partial class User
 {
     public int UserId { get; set; }
 
-
-
     public string Username { get; set; } = null!;
 
     public string Password { get; set; } = null!;
@@ -17,6 +15,7 @@ public partial class User
 
     public int Role { get; set; }
 
+    // full name
     public string? Preferences { get; set; }
 
     public DateTime? CreateAt { get; set; }

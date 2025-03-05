@@ -2,6 +2,7 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+	string trashIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' style='color:white' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-trash-2'><path d='M3 6h18' /><path d='M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6' /><path d='M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2' /><line x1='10' x2='10' y1='11' y2='17' /><line x1='14' x2='14' y1='11' y2='17' /></svg>";
 }
 <style>
 	.cart-thumbnail {
@@ -70,12 +71,19 @@
 									<td class="align-middle">@book.Title</td>
 									<td class="align-middle">@book.Price ₫</td>
 									<td class="align-middle">
-										<input type="number" class="form-control quantity-input" value="@quantity" min="1">
+										<input type="number"
+											   class="form-control quantity-input"
+											   value="@quantity"
+											   min="1"
+											   onchange="updateCartQuantity(@book.BookId, this.value)">
 									</td>
 									<td class="align-middle">@(book.Price * quantity)₫</td>
 									<td class="align-middle text-center">
 										<i class="bi bi-x-lg remove-item"></i>
 									</td>
+
+									<td class="align-middle text-center" ><button class="btn btn-secondary" onclick="removeItem(@book.BookId)">@Html.Raw(trashIcon)</button> </td>
+
 								</tr>
 							}
 						</tbody>
@@ -91,7 +99,7 @@
 
 			<!-- Return to Shop Button -->
 			<div class="mt-4">
-				<a href="#" class="btn btn-outline-secondary">
+				<a asp-action="index" asp-controller="home" class="btn btn-outline-secondary">
 					<i class="bi bi-arrow-left me-2"></i>Return To Shop
 				</a>
 			</div>
@@ -106,7 +114,7 @@
 					<!-- Subtotal -->
 					<div class="d-flex justify-content-between mb-3">
 						<span>Subtotal</span>
-						<span class="fw-bold">1,085,000 ₫</span>
+						<span class="fw-bold" id="subtotal"> ₫</span>
 					</div>
 
 					<!-- Shipping Options -->
@@ -131,15 +139,116 @@
 
 					<!-- Total -->
 					<div class="d-flex justify-content-between mb-4">
-						<span class="fw-bold">Total</span>
-						<span class="fw-bold">1,120,000 ₫</span>
+						<span class="fw-bold" >Total</span>
+						<span class="fw-bold" id="total">00 ₫</span>
 					</div>
 
 					<!-- Checkout Button -->
-					<button class="btn btn-success w-100 py-2">Go To Secure Checkout</button>
+					<a asp-action="index" asp-controller="checkout" class="btn btn-success w-100 py-2">Go To Secure Checkout</a>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
+<script>
+	var subtotal= @(ViewBag.Subtotal);
+	console.log(subtotal);
+	var subtotalview = document.getElementById("subtotal");
+	subtotalview.innerText = subtotal + " ₫";
+	// console.log(subtotalview);
+
+
+	document.addEventListener('DOMContentLoaded', updateTotal());
+	function updateTotal(){
+		const shippingOptions = document.querySelectorAll('input[name="shipping"]');
+		const totalElement = document.getElementById('total');
+		let baseTotal = subtotal; // Initial total amount (without shipping)
+
+		shippingOptions.forEach(option => {
+			option.addEventListener('change', function () {
+				let shippingCost = 0;
+
+				if (this.id === 'shipping1') {
+					shippingCost = 35000; // Standard Shipping
+				} else if (this.id === 'shipping2') {
+					shippingCost = 0; // Local Pickup (free)
+				}
+
+				const newTotal = baseTotal + shippingCost;
+				totalElement.innerText = `${newTotal.toLocaleString()} ₫`;
+			});
+		});
+	}
+	function updateTotal2(){
+		const shippingOptions = document.querySelectorAll('input[name="shipping"]');
+		const totalElement = document.getElementById('total');
+		let baseTotal = subtotal; // Initial total amount (without shipping)
+		let shippingCost = 0;
+
+		shippingOptions.forEach(option => {
+			if (option.checked) {
+				shippingCost = option.id === 'shipping1' ? 35000 : 0;
+			}
+		});
+
+		const newTotal = baseTotal + shippingCost;
+		totalElement.innerText = `${newTotal.toLocaleString()} ₫`;
+	}
+
+	function updateCartQuantity(bookId, quantity) {
+		var sendData = {
+			bookId : bookId,
+			quantity: quantity
+		}
+
+		fetch('/UpdateCartQuantity', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ bookId: bookId, quantity: quantity }),
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.success) {
+				loadCartCount();
+				// Update the total for this item
+				const itemRow = document.querySelector(`input[onchange="updateCartQuantity(${bookId}, this.value)"]`).closest('tr');
+				const itemTotalCell = itemRow.querySelector('td:nth-child(5)');
+				itemTotalCell.innerText = `${data.itemTotal}₫`;
+
+
+				// Update the subtotal
+				const subtotalview = document.getElementById("subtotal");
+				subtotalview.innerText = data.subtotal + " ₫";
+				subtotal = data.subtotal;
+				updateTotal2();
+			} else {
+				console.error('Failed to update cart.');
+			}
+		})
+		.catch(error => console.error('Error:', error));
+	}
+	function removeItem(bookId){
+
+		console.log(bookId);
+		fetch('/RemoveFromCart', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ bookId: bookId}),
+		})	.then(response => response.json())
+			.then(data => {
+				console.log(data);
+				window.location.reload(true);
+			})
+			.catch((err) => {
+				console.log(err);
+
+			})
+	}
+
+
+</script>
 
