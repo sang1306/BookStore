@@ -58,7 +58,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							@foreach (BookStore.Controllers.CartItemDetails item in ViewBag.CartBooks)
+							@foreach (BookStore.Dtos.OrderDto.CartItemDetail item in ViewBag.CartBooks)
 							{
 								var book = item.Book;
 								var quantity = item.Quantity;

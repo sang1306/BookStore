@@ -1,26 +1,11 @@
-﻿using System.Security.Cryptography.Pkcs;
+﻿using BookStore.Dtos.OrderDto;
 using BookStore.Models;
 using BookStore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace BookStore.Controllers
+namespace BookStore.Controllers.Checkout
 {
-    public class CartItem
-    {
-        public int BookId { get; set; }
-        public int Quantity { get; set; }
-    }
-    public class CartItemDetails
-    {
-        public Book Book { get; set; }
-        public int Quantity { get; set; }
-    }
-    public class CartUpdateModel
-    {
-        public int BookId { get; set; }
-        public int Quantity { get; set; }
-    }
 
     public class OrdersController : Controller
     {
@@ -44,12 +29,12 @@ namespace BookStore.Controllers
 
 
             // set book from service
-            List<BookStore.Models.Book> listBooks = _service.GetBooksByIds(cartItems.Select(c => c.BookId).ToList());
+            List<Book> listBooks = _service.GetBooksByIds(cartItems.Select(c => c.BookId).ToList());
             // create dictionary
-            List<CartItemDetails> booksWithQuanity = listBooks.Select(book =>
+            List<CartItemDetail> booksWithQuanity = listBooks.Select(book =>
             {
                 var cartItem = cartItems.FirstOrDefault(b => b.BookId == book.BookId);
-                return new CartItemDetails
+                return new CartItemDetail
                 {
                     Book = book,
                     Quantity = cartItem?.Quantity ?? 1
@@ -205,7 +190,7 @@ namespace BookStore.Controllers
             {
                 success = true,
                 cartCount = totalItemsCount,
-                itemTotal = itemTotal,
+                itemTotal,
                 subtotal = CalcTotal(updatedCartCookie)
             });
         }
@@ -215,12 +200,12 @@ namespace BookStore.Controllers
             List<CartItem> cartItems = _service.ExtractCartItem(cart);
 
             // set book from service
-            List<BookStore.Models.Book> listBooks = _service.GetBooksByIds(cartItems.Select(c => c.BookId).ToList());
+            List<Book> listBooks = _service.GetBooksByIds(cartItems.Select(c => c.BookId).ToList());
             // create dictionary
-            List<CartItemDetails> booksWithQuanity = listBooks.Select(book =>
+            List<CartItemDetail> booksWithQuanity = listBooks.Select(book =>
             {
                 var cartItem = cartItems.FirstOrDefault(b => b.BookId == book.BookId);
-                return new CartItemDetails
+                return new CartItemDetail
                 {
                     Book = book,
                     Quantity = cartItem?.Quantity ?? 1
@@ -237,7 +222,7 @@ namespace BookStore.Controllers
             return total;
         }
 
- 
+
     }
 }
 
