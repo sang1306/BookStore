@@ -5,7 +5,9 @@ using BookStore.Models;
 using BookStore.Services;
 using BookStore.Utils;
 using chat_application_demo.Utils;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using SQLitePCL;
 
 namespace BookStore.Controllers.Checkout
@@ -15,12 +17,14 @@ namespace BookStore.Controllers.Checkout
     {
 
 
+        private readonly ILogger _logger;
         private readonly OrderService _service;
         private readonly IConfiguration _configuration;
-        public CheckOutController(OrderService service, IConfiguration configuration)
+        public CheckOutController(OrderService service, IConfiguration configuration, ILogger<CheckOutController> logger)
         {
             _service = service;
             _configuration = configuration;
+            _logger = logger;
         }
         public IActionResult Index()
         {
@@ -37,7 +41,7 @@ namespace BookStore.Controllers.Checkout
             }
 
 
-            decimal shipping = 35000;
+            decimal shipping = 10000;
 
             ViewBag.User = user;
             ViewBag.Subtotal = subtotal;
@@ -117,34 +121,32 @@ namespace BookStore.Controllers.Checkout
 
             Console.WriteLine(order);
 
-            return RedirectToAction("Index", "Home");
+
+            string vnpayurl = _service.CreatePaymentUrl(order.OrderId, HttpContext);
+
+            return Redirect(vnpayurl);
         }
-        
-        private string CreatePaymentUrl(int orderId)
+
+        [HttpGet("/PaymentCallback")]
+        public IActionResult PaymentCallback()
         {
-            var order = _service.GetById(orderId);
-            if (order == null) return "";
+            _logger.LogInformation("Begin VNPAY Return, URL={0}", Request.GetDisplayUrl());
 
-            var tick = DateTime.Now.Ticks.ToString();
-            var vnpay = new VnPayLibrary();
-            vnpay.AddRequestData("vnp_Version", "2.1.0");
-            vnpay.AddRequestData("vnp_Command", "pay");
-            vnpay.AddRequestData("vnp_TmnCode", _configuration["Vnpay:TmnCode"]);
-            vnpay.AddRequestData("vnp_Amount", ((int)(order.TotalAmount * 100)).ToString());
-            vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
-            vnpay.AddRequestData("vnp_CurrCode", "VND");
-            vnpay.AddRequestData("vnp_IpAddr", HttpContext.Connection.RemoteIpAddress?.ToString());
-            vnpay.AddRequestData("vnp_Locale", "vn");
-            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toán cho đơn hàng: " + order.OrderId);
-            vnpay.AddRequestData("vnp_OrderType", "other");
-            vnpay.AddRequestData("vnp_ReturnUrl", _configuration["Vnpay:ReturnUrl"]);
-            vnpay.AddRequestData("vnp_TxnRef", tick);
+            var vnPay = new VnPayLibrary(_configuration);
 
-            string paymentUrl = vnpay.CreateRequestUrl(_configuration["Vnpay:Url"], _configuration["Vnpay:HashSecret"]);
-            return paymentUrl;
+            _logger.LogInformation("Request.Query list:");
+            // Populate _responseData with query parameters
+            foreach (var (key, value) in Request.Query)
+            {
+                vnPay._responseData[key] = value;  // Directly add to the dictionary
+                Console.WriteLine("key: " + key + ", value: " + value);
+            }
+
+            bool isValid = vnPay.ValidateSignature(vnPay.GetResponseDataByKey("vnp_SecureHash"));
+
+            ViewBag.Sucess = isValid;
+            return View();
         }
 
-
-        
     }
 }
