@@ -34,7 +34,7 @@ function removeRememberMe() {
 // cart function 
 function addCart(bookId) {
     $.ajax({
-        url: '/Orders/AddTocart',
+        url: '/Cart/AddTocart',
         type: 'POST',
         data: { bookId: bookId },
         success: function (result) {

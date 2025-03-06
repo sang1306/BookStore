@@ -69,7 +69,7 @@
 											 alt="Book cover" class="cart-thumbnail">
 									</td>
 									<td class="align-middle">@book.Title</td>
-									<td class="align-middle">@book.Price ₫</td>
+									<td class="align-middle">@book.Price.Value.ToString("N0") ₫</td>
 									<td class="align-middle">
 										<input type="number"
 											   class="form-control quantity-input"
@@ -77,13 +77,12 @@
 											   min="1"
 											   onchange="updateCartQuantity(@book.BookId, this.value)">
 									</td>
-									<td class="align-middle">@(book.Price * quantity)₫</td>
+									<td class="align-middle">@((book.Price * quantity).Value.ToString("N0")) ₫</td>
 									<td class="align-middle text-center">
 										<i class="bi bi-x-lg remove-item"></i>
 									</td>
 
-									<td class="align-middle text-center" ><button class="btn btn-secondary" onclick="removeItem(@book.BookId)">@Html.Raw(trashIcon)</button> </td>
-
+									<td class="align-middle text-center"><button class="btn btn-secondary" onclick="removeItem(@book.BookId)">@Html.Raw(trashIcon)</button> </td>
 								</tr>
 							}
 						</tbody>
@@ -121,13 +120,13 @@
 					<div class="mb-3">
 						<p class="mb-2">Shipping</p>
 						<div class="form-check mb-2">
-							<input class="form-check-input" type="radio" name="shipping" id="shipping1" checked>
+							<input class="form-check-input" type="radio" name="shipping" id="shipping1">
 							<label class="form-check-label" for="shipping1">
 								Standard Shipping: 35,000 ₫
 							</label>
 						</div>
 						<div class="form-check mb-2">
-							<input class="form-check-input" type="radio" name="shipping" id="shipping2">
+							<input class="form-check-input" type="radio" name="shipping" id="shipping2" checked>
 							<label class="form-check-label" for="shipping2">
 								Local pickup (available at Bluish after 12pm of next working day)
 							</label>
@@ -139,7 +138,7 @@
 
 					<!-- Total -->
 					<div class="d-flex justify-content-between mb-4">
-						<span class="fw-bold" >Total</span>
+						<span class="fw-bold">Total</span>
 						<span class="fw-bold" id="total">00 ₫</span>
 					</div>
 
@@ -154,30 +153,49 @@
 	var subtotal= @(ViewBag.Subtotal);
 	console.log(subtotal);
 	var subtotalview = document.getElementById("subtotal");
-	subtotalview.innerText = subtotal + " ₫";
-	// console.log(subtotalview);
+	subtotalview.innerText = subtotal.toLocaleString('vi-VN') + " ₫";
+	// subtotalview.innerText = subtotal + " ₫";
+
+	console.log(subtotal);
 
 
 	document.addEventListener('DOMContentLoaded', updateTotal());
+
 	function updateTotal(){
-		const shippingOptions = document.querySelectorAll('input[name="shipping"]');
-		const totalElement = document.getElementById('total');
-		let baseTotal = subtotal; // Initial total amount (without shipping)
+		  const shippingOptions = document.querySelectorAll('input[name="shipping"]');
+	const totalElement = document.getElementById('total');
+	// Assuming subtotal is defined elsewhere - add a fallback just in case
+	let baseTotal = (typeof subtotal !== 'undefined') ? subtotal : 0;
 
-		shippingOptions.forEach(option => {
-			option.addEventListener('change', function () {
-				let shippingCost = 0;
+	// Initial update based on currently selected option
+	let selectedOption = document.querySelector('input[name="shipping"]:checked');
+	let initialShippingCost = 0;
 
-				if (this.id === 'shipping1') {
-					shippingCost = 35000; // Standard Shipping
-				} else if (this.id === 'shipping2') {
-					shippingCost = 0; // Local Pickup (free)
-				}
+	if (selectedOption) {
+	  if (selectedOption.id === 'shipping1') {
+		initialShippingCost = 35000; // Standard Shipping
+	  } else if (selectedOption.id === 'shipping2') {
+		initialShippingCost = 0; // Local Pickup
+	  }
+	}
 
-				const newTotal = baseTotal + shippingCost;
-				totalElement.innerText = `${newTotal.toLocaleString()} ₫`;
-			});
-		});
+	totalElement.innerText = `${(baseTotal + initialShippingCost).toLocaleString()} ₫`;
+
+	// Set up event listeners (only once per option)
+	shippingOptions.forEach(option => {
+	  option.addEventListener('change', function() {
+		let shippingCost = 0;
+		if (this.id === 'shipping1') {
+		  shippingCost = 35000; // Standard Shipping
+		} else if (this.id === 'shipping2') {
+		  shippingCost = 0; // Local Pickup (free)
+		}
+		const newTotal = baseTotal + shippingCost;
+		totalElement.innerText = `${newTotal.toLocaleString()} ₫`;
+	  });
+	});
+
+
 	}
 	function updateTotal2(){
 		const shippingOptions = document.querySelectorAll('input[name="shipping"]');
@@ -192,7 +210,7 @@
 		});
 
 		const newTotal = baseTotal + shippingCost;
-		totalElement.innerText = `${newTotal.toLocaleString()} ₫`;
+		totalElement.innerText = `${newTotal.toLocaleString('vi-VN')} ₫`;
 	}
 
 	function updateCartQuantity(bookId, quantity) {
@@ -220,7 +238,7 @@
 
 				// Update the subtotal
 				const subtotalview = document.getElementById("subtotal");
-				subtotalview.innerText = data.subtotal + " ₫";
+				subtotalview.innerText = data.subtotal.toLocaleString('vi-VN') + " ₫";
 				subtotal = data.subtotal;
 				updateTotal2();
 			} else {

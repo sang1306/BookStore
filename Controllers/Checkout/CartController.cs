@@ -7,19 +7,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookStore.Controllers.Checkout
 {
 
-    public class OrdersController : Controller
+    public class CartController : Controller
     {
         private readonly OrderService _service;
-        public OrdersController(OrderService service)
+        public CartController(OrderService service)
         {
             _service = service;
         }
         public IActionResult Index()
-        {
-            return View();
-        }
-        [HttpGet("/Cart")]
-        public IActionResult Cart()
         {
             // get string from cookie = "cart"
             string carCookie = Request.Cookies["cart"];
@@ -53,7 +48,46 @@ namespace BookStore.Controllers.Checkout
             // send them to viewbag
             ViewBag.CartBooks = booksWithQuanity;
             return View();
+
         }
+
+
+        //[HttpGet("/Cart")]
+        //public IActionResult Cart()
+        //{
+        //    // get string from cookie = "cart"
+        //    string carCookie = Request.Cookies["cart"];
+
+        //    // parse cookie string to list [BookId:Quantity]
+        //    List<CartItem> cartItems = _service.ExtractCartItem(carCookie);
+
+
+        //    // set book from service
+        //    List<Book> listBooks = _service.GetBooksByIds(cartItems.Select(c => c.BookId).ToList());
+        //    // create dictionary
+        //    List<CartItemDetail> booksWithQuanity = listBooks.Select(book =>
+        //    {
+        //        var cartItem = cartItems.FirstOrDefault(b => b.BookId == book.BookId);
+        //        return new CartItemDetail
+        //        {
+        //            Book = book,
+        //            Quantity = cartItem?.Quantity ?? 1
+        //        };
+        //    }).ToList();
+
+        //    decimal total = 0;
+        //    foreach (var book in booksWithQuanity)
+        //    {
+        //        decimal onebook = book.Quantity * book.Book.Price.Value;
+        //        total += onebook;
+        //    }
+
+
+        //    ViewBag.Subtotal = total;
+        //    // send them to viewbag
+        //    ViewBag.CartBooks = booksWithQuanity;
+        //    return View();
+        //}
 
         [HttpPost("AddTocart")]
         public IActionResult AddToCart(int bookId, int quantity = 1)

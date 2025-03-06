@@ -20,11 +20,13 @@ namespace BookStore.Controllers.Checkout
         private readonly ILogger _logger;
         private readonly OrderService _service;
         private readonly IConfiguration _configuration;
+
         public CheckOutController(OrderService service, IConfiguration configuration, ILogger<CheckOutController> logger)
         {
             _service = service;
             _configuration = configuration;
             _logger = logger;
+
         }
         public IActionResult Index()
         {
@@ -40,8 +42,7 @@ namespace BookStore.Controllers.Checkout
                 subtotal += onebook;
             }
 
-
-            decimal shipping = 10000;
+            decimal shipping = 35000;
 
             ViewBag.User = user;
             ViewBag.Subtotal = subtotal;
@@ -132,7 +133,7 @@ namespace BookStore.Controllers.Checkout
         {
             _logger.LogInformation("Begin VNPAY Return, URL={0}", Request.GetDisplayUrl());
 
-            var vnPay = new VnPayLibrary(_configuration);
+            var vnPay = new VnPayLibrary();
 
             _logger.LogInformation("Request.Query list:");
             // Populate _responseData with query parameters
@@ -142,7 +143,9 @@ namespace BookStore.Controllers.Checkout
                 Console.WriteLine("key: " + key + ", value: " + value);
             }
 
-            bool isValid = vnPay.ValidateSignature(vnPay.GetResponseDataByKey("vnp_SecureHash"));
+            string hash = _configuration["Vnpay:vnp_HashSecret"];
+            
+            bool isValid = vnPay.ValidateSignature(vnPay.GetResponseDataByKey("vnp_SecureHash"), hash);
 
             ViewBag.Sucess = isValid;
             return View();
