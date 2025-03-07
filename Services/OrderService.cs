@@ -227,5 +227,14 @@ namespace BookStore.Services
             
         }
 
+        public  bool CheckQuantity(int bookId, int quantity)
+        {
+            var book = _context.Books.Find(bookId);
+            if (quantity > book.Stock)
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }

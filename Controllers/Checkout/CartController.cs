@@ -152,6 +152,17 @@ namespace BookStore.Controllers.Checkout
             cartItems = _service.ExtractCartItem(cartCookie);
 
 
+            // check quantity of that item 
+            if (!_service.CheckQuantity(bookId, quantity))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Out of Stock"
+                });
+            }
+
+
             // Find and update item quantity
             var existingItem = cartItems.FirstOrDefault(item => item.BookId == bookId);
             if (existingItem != null)
