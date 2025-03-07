@@ -73,8 +73,6 @@ namespace BookStore.Controllers.Checkout
             return booksWithQuanity;
         }
 
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult PlaceOrder(OrderRequest orderRequest)
@@ -118,6 +116,9 @@ namespace BookStore.Controllers.Checkout
                 };
             }).ToList();
 
+
+            Response.Cookies.Delete("cart");
+
             //User user = UserSessionManager.GetUserInfo(HttpContext);
 
             Order order = _service.CreateOrder(orderRequest, user.UserId, orderDetails);
@@ -127,7 +128,8 @@ namespace BookStore.Controllers.Checkout
             // out of stock 
             if (order.OrderStatus == Enums.OrderStatus.OutOfStock)
             {
-                return View();
+                string username = UserSessionManager.GetUserInfo(HttpContext).Username;
+                return RedirectToAction("OrderDetail", new { username = username, orderId = order.OrderId });
             }
 
             string vnpayurl = _service.CreatePaymentUrl(order.OrderId, HttpContext);
@@ -138,6 +140,7 @@ namespace BookStore.Controllers.Checkout
         [HttpGet("/PaymentCallback")]
         public IActionResult PaymentCallback()
         {
+
             _logger.LogInformation("Begin VNPAY Return, URL={0}", Request.GetDisplayUrl());
 
             var vnPay = new VnPayLibrary();
@@ -157,7 +160,11 @@ namespace BookStore.Controllers.Checkout
             if (isValid)
             {
                 // success set update 
+                // check status code 
+                // success set order status is paid
+                // fail rollback quantity  , set order status is fail
                 var order = _service.UpdatePreference(Request.GetDisplayUrl());
+
                 string username = UserSessionManager.GetUserInfo(HttpContext).Username;
                 int orderId = order.OrderId;
                 return RedirectToAction("OrderDetail", new { username = username, orderId = orderId });
@@ -171,25 +178,63 @@ namespace BookStore.Controllers.Checkout
 
         }
 
-
         [Route("{username}/Order/{orderId}")]
         public IActionResult OrderDetail(string username, int orderId)
         {
-            ViewBag.usename = username;
-            ViewBag.orderId = orderId;
+            //Request.Cookies["card"].Expires = DateTime.Now.AddDays(-1);
+
             if (UserSessionManager.GetUserInfo(HttpContext).Username.Equals(username))
             {
+                // username doesn't match
+                if (!UserSessionManager.GetUserInfo(HttpContext).Username.Equals(username))
+                {
+                    return Redirect("/");
+                }
 
                 var order = _service.GetById(orderId);
-                var response = _service.ParseVnPayResponse(order.Preferences);
-
-
                 ViewBag.order = order;
+
+                // out of stock orders
+                if (order.OrderStatus == Enums.OrderStatus.OutOfStock)
+                {
+                    ViewBag.status = false;
+                    ViewBag.message = "Some book is out of order sorry";
+                    return View();
+                }
+
+                var response = _service.ParseVnPayResponse(order.Preferences);
                 ViewBag.response = response;
+                ViewBag.message = _configuration[$"VnpayResponseCodes:{response.ResponseCode}"];
+
+                // status check 
+                string[] successCodes = { "00", "07" };
+                ViewBag.status = successCodes.Contains(response.ResponseCode);
 
                 return View();
+
             }
             return Redirect("/");
+        }
+
+        [Route("{username}/Order")]
+        public IActionResult OrderView(string username, int page = 1, int pageSize = 5)
+        {
+            ViewBag.username = username;
+
+            var user = UserSessionManager.GetUserInfo(HttpContext);
+            var allOrders = _service.GetListOrder(user.UserId);
+
+            // Pagination logic
+            var paginatedOrders = allOrders
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewBag.orders = paginatedOrders;
+            ViewBag.currentPage = page;
+            ViewBag.totalPages = (int)Math.Ceiling((double)allOrders.Count / pageSize);
+
+            return View();
         }
     }
 }

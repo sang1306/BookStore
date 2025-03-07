@@ -38,47 +38,65 @@ namespace BookStore.Services
             return _context.Books.Where(b => listId.Contains(b.BookId)).ToList();
         }
 
+        public List<Order> GetListOrder(int userId)
+        {
+            return _context.Orders.Include(o => o.User).Where(o => o.UserId == userId).ToList();
+        }
+
         public Order GetById(int id)
         {
-            return _context.Orders.Include(o => o.OrderDetails).FirstOrDefault(e => e.OrderId == id);
+            return _context.Orders.Include(o => o.OrderDetails)
+                .ThenInclude(d => d.Book).Include(o => o.User)
+                .FirstOrDefault(e => e.OrderId == id);
         }
 
         public Order CreateOrder(OrderRequest request, int userId, List<OrderDetail> details)
         {
+            using var transaction = _context.Database.BeginTransaction();
 
-            var orderdb = _context.Orders.Add(new Order()
+            var order = new Order
             {
                 UserId = userId,
                 OrderStatus = Enums.OrderStatus.Pending,
                 OrderDate = DateTime.UtcNow,
-                Address = request.StreetAdress + ", " + request.City,
+                Address = $"{request.StreetAdress}, {request.City}",
                 Phone = request.Phone,
                 TotalAmount = request.TotalAmount,
                 OrderDetails = details
-            }).Entity;
-            UpdateBookQuantity(details);
+            };
 
-            // Check if stock is valid and update quantities
+            _context.Orders.Add(order);
+
+            // Check and update stock
             bool isStockValid = UpdateBookQuantity(details);
             if (!isStockValid)
             {
-                orderdb.OrderStatus = Enums.OrderStatus.OutOfStock;
-                // Rollback book quantities
+                order.OrderStatus = Enums.OrderStatus.OutOfStock;
                 RollbackBookQuantity(details);
+                _context.SaveChanges();
+                transaction.Rollback();
+                return order;
             }
+
             _context.SaveChanges();
-            return orderdb;
+            transaction.Commit();
+            return order;
         }
+        
 
         public bool UpdateBookQuantity(List<OrderDetail> details)
         {
             foreach (var item in details)
             {
-                var book = _context.Books.FirstOrDefault(b => b.BookId == item.BookId);
+                var book = _context.Books
+                    .Where(b => b.BookId == item.BookId)
+                    .FirstOrDefault();
+
                 if (book == null || book.Stock < item.Quantity.Value)
                 {
                     return false; // Not enough stock or book not found
                 }
+
                 book.Stock -= item.Quantity.Value;
             }
             return true;
@@ -88,14 +106,18 @@ namespace BookStore.Services
         {
             foreach (var item in details)
             {
-                var book = _context.Books.FirstOrDefault(b => b.BookId == item.BookId);
+                var book = _context.Books
+                    .Where(b => b.BookId == item.BookId)
+                    .FirstOrDefault();
+
                 if (book != null)
                 {
-                    book.Stock += item.Quantity.Value; // Reverse the stock deduction
+                    book.Stock += item.Quantity.Value; // Restore stock if order fails
+                    _logger.LogInformation($"OrderService:RollBack {book.Title} + quantity: {item.Quantity.Value}");
+
                 }
             }
         }
-
 
 
         public List<CartItem> ExtractCartItem(string cookie)
@@ -161,8 +183,22 @@ namespace BookStore.Services
         public Order UpdatePreference(string url)
         {
             var response = ParseVnPayResponse(url);
-            var order = _context.Orders.FirstOrDefault(e => e.OrderId == int.Parse(response.TxnRef));
+            var order = _context.Orders.Include(o => o.OrderDetails).FirstOrDefault(e => e.OrderId == int.Parse(response.TxnRef));
             order.Preferences = url;
+
+            if (response.ResponseCode.Equals("00") || response.ResponseCode.Equals("07"))
+            {
+                // success 
+                order.OrderStatus = Enums.OrderStatus.Paid;
+            }
+            else
+            {
+                // fail create reroll
+                order.OrderStatus = Enums.OrderStatus.Cancelled;
+                RollbackBookQuantity(order.OrderDetails.ToList());
+                _logger.LogInformation($"OrderService:UpdatePreference:RollBack {order.OrderId}");
+            }
+
             _context.SaveChanges();
             return order;
         }
@@ -173,19 +209,22 @@ namespace BookStore.Services
 
             return new VnPayResponseQuery
             {
-                Amount = long.Parse(queryParams["vnp_Amount"]),
-                BankCode = queryParams["vnp_BankCode"],
-                BankTranNo = queryParams["vnp_BankTranNo"],
-                CardType = queryParams["vnp_CardType"],
-                OrderInfo = Uri.UnescapeDataString(queryParams["vnp_OrderInfo"]),
-                PayDate = DateTime.ParseExact(queryParams["vnp_PayDate"], "yyyyMMddHHmmss", null),
-                ResponseCode = queryParams["vnp_ResponseCode"],
-                TmnCode = queryParams["vnp_TmnCode"],
-                TransactionNo = queryParams["vnp_TransactionNo"],
-                TransactionStatus = queryParams["vnp_TransactionStatus"],
-                TxnRef = queryParams["vnp_TxnRef"],
-                SecureHash = queryParams["vnp_SecureHash"]
+                Amount = queryParams.TryGetValue("vnp_Amount", out var amount) ? long.Parse(amount) : null,
+                BankCode = queryParams.TryGetValue("vnp_BankCode", out var bankCode) ? bankCode.ToString() : null,
+                BankTranNo = queryParams.TryGetValue("vnp_BankTranNo", out var bankTranNo) ? bankTranNo.ToString() : null,
+                CardType = queryParams.TryGetValue("vnp_CardType", out var cardType) ? cardType.ToString() : null,
+                OrderInfo = queryParams.TryGetValue("vnp_OrderInfo", out var orderInfo) ? Uri.UnescapeDataString(orderInfo) : null,
+                PayDate = queryParams.TryGetValue("vnp_PayDate", out var payDate) ?
+                DateTime.ParseExact(payDate, "yyyyMMddHHmmss", null) : DateTime.UtcNow,
+                ResponseCode = queryParams.TryGetValue("vnp_ResponseCode", out var responseCode) ? responseCode.ToString() : null,
+                TmnCode = queryParams.TryGetValue("vnp_TmnCode", out var tmnCode) ? tmnCode.ToString() : null,
+                TransactionNo = queryParams.TryGetValue("vnp_TransactionNo", out var transactionNo) ? transactionNo.ToString() : null,
+                TransactionStatus = queryParams.TryGetValue("vnp_TransactionStatus", out var transactionStatus) ?
+                         transactionStatus.ToString() : null,
+                TxnRef = queryParams.TryGetValue("vnp_TxnRef", out var txnRef) ? txnRef.ToString() : null,
+                SecureHash = queryParams.TryGetValue("vnp_SecureHash", out var secureHash) ? secureHash.ToString() : null
             };
+            
         }
 
     }
