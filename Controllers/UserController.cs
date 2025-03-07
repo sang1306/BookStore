@@ -1,4 +1,5 @@
 ﻿using BookStore.Models;
+using BookStore.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
@@ -27,59 +28,62 @@ namespace BookStore.Controllers
             return View(user);
         }
 
-		public IActionResult EditProfile(int id)
-		{
-			var user = prn222BookshopContext.Users.Find(id);
-			if (user == null)
-			{
-				return NotFound();
-			}
-			return View(user);
-		}
-
-		
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> EditProfile(User model)
-		{
-			
-
-			var user = await prn222BookshopContext.Users.FindAsync(model.UserId);
-			if (user == null)
-			{
-                
+        public IActionResult EditProfile(int id)
+        {
+            var user = prn222BookshopContext.Users.Find(id);
+            if (user == null)
+            {
                 return NotFound();
-			}
-           
+            }
+            return View(user);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile(User model)
+        {
+
+
+            var user = await prn222BookshopContext.Users.FindAsync(model.UserId);
+            if (user == null)
+            {
+
+                return NotFound();
+            }
+
             user.Username = model.Username;
-			user.Email = model.Email;
-			user.Address = model.Address;
-			user.Status = model.Status;
+            user.Email = model.Email;
+            user.Address = model.Address;
+            user.Status = model.Status;
 
-			try
-			{
-				await prn222BookshopContext.SaveChangesAsync();
-				_logger.LogInformation("Password updated successfully for UserId: {UserId}", user.UserId);
-				return RedirectToAction("UserProfile", new { id = user.UserId });
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError("Error updating password: {Message}", ex.Message);
-				ModelState.AddModelError("", "Error saving data: " + ex.Message);
-				return View(model);
-			}
+            try
+            {
+                // update password use 
+                // string newPassword = StringUtils.ComputeSha256Hash(model.Password);
+
+                await prn222BookshopContext.SaveChangesAsync();
+                _logger.LogInformation("Password updated successfully for UserId: {UserId}", user.UserId);
+                return RedirectToAction("UserProfile", new { id = user.UserId });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error updating password: {Message}", ex.Message);
+                ModelState.AddModelError("", "Error saving data: " + ex.Message);
+                return View(model);
+            }
 
 
-		}
+        }
 
-		private string HashPassword(string password)
-		{
-			using (var sha256 = SHA256.Create())
-			{
-				var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-				return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
-			}
-		}
+        //private string HashPassword(string password)
+        //{
+        //	using (var sha256 = SHA256.Create())
+        //	{
+        //		var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+        //		return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+        //	}
+        //}
 
-	}
+    }
 }
