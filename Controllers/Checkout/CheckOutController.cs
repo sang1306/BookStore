@@ -7,6 +7,7 @@ using BookStore.Utils;
 using chat_application_demo.Utils;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using SQLitePCL;
 
@@ -73,6 +74,7 @@ namespace BookStore.Controllers.Checkout
         }
 
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult PlaceOrder(OrderRequest orderRequest)
@@ -122,6 +124,11 @@ namespace BookStore.Controllers.Checkout
 
             Console.WriteLine(order);
 
+            // out of stock 
+            if (order.OrderStatus == Enums.OrderStatus.OutOfStock)
+            {
+                return View();
+            }
 
             string vnpayurl = _service.CreatePaymentUrl(order.OrderId, HttpContext);
 
@@ -144,12 +151,45 @@ namespace BookStore.Controllers.Checkout
             }
 
             string hash = _configuration["Vnpay:vnp_HashSecret"];
-            
+
             bool isValid = vnPay.ValidateSignature(vnPay.GetResponseDataByKey("vnp_SecureHash"), hash);
 
-            ViewBag.Sucess = isValid;
-            return View();
+            if (isValid)
+            {
+                // success set update 
+                var order = _service.UpdatePreference(Request.GetDisplayUrl());
+                string username = UserSessionManager.GetUserInfo(HttpContext).Username;
+                int orderId = order.OrderId;
+                return RedirectToAction("OrderDetail", new { username = username, orderId = orderId });
+            }
+            else
+            {
+                // fall set fail and roll back
+                ViewBag.Sucess = isValid;
+                return View();
+            }
+
         }
 
+
+        [Route("{username}/Order/{orderId}")]
+        public IActionResult OrderDetail(string username, int orderId)
+        {
+            ViewBag.usename = username;
+            ViewBag.orderId = orderId;
+            if (UserSessionManager.GetUserInfo(HttpContext).Username.Equals(username))
+            {
+
+                var order = _service.GetById(orderId);
+                var response = _service.ParseVnPayResponse(order.Preferences);
+
+
+                ViewBag.order = order;
+                ViewBag.response = response;
+
+                return View();
+            }
+            return Redirect("/");
+        }
     }
 }

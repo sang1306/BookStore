@@ -15,7 +15,6 @@ public partial class User
 
     public int Role { get; set; }
 
-    // full name
     public string? Preferences { get; set; }
 
     public DateTime? CreateAt { get; set; }

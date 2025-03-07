@@ -2,7 +2,9 @@
 using BookStore.Dtos.OrderDto;
 using BookStore.Models;
 using BookStore.Utils;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 namespace BookStore.Services
 {
@@ -38,10 +40,10 @@ namespace BookStore.Services
 
         public Order GetById(int id)
         {
-            return _context.Orders.FirstOrDefault(e => e.OrderId == id);
+            return _context.Orders.Include(o => o.OrderDetails).FirstOrDefault(e => e.OrderId == id);
         }
 
-        public Order CreateOrder(OrderRequest request, int userId, List<OrderDetail> detais)
+        public Order CreateOrder(OrderRequest request, int userId, List<OrderDetail> details)
         {
 
             var orderdb = _context.Orders.Add(new Order()
@@ -52,11 +54,49 @@ namespace BookStore.Services
                 Address = request.StreetAdress + ", " + request.City,
                 Phone = request.Phone,
                 TotalAmount = request.TotalAmount,
-                OrderDetails = detais
+                OrderDetails = details
             }).Entity;
+            UpdateBookQuantity(details);
+
+            // Check if stock is valid and update quantities
+            bool isStockValid = UpdateBookQuantity(details);
+            if (!isStockValid)
+            {
+                orderdb.OrderStatus = Enums.OrderStatus.OutOfStock;
+                // Rollback book quantities
+                RollbackBookQuantity(details);
+            }
             _context.SaveChanges();
             return orderdb;
         }
+
+        public bool UpdateBookQuantity(List<OrderDetail> details)
+        {
+            foreach (var item in details)
+            {
+                var book = _context.Books.FirstOrDefault(b => b.BookId == item.BookId);
+                if (book == null || book.Stock < item.Quantity.Value)
+                {
+                    return false; // Not enough stock or book not found
+                }
+                book.Stock -= item.Quantity.Value;
+            }
+            return true;
+        }
+
+        public void RollbackBookQuantity(List<OrderDetail> details)
+        {
+            foreach (var item in details)
+            {
+                var book = _context.Books.FirstOrDefault(b => b.BookId == item.BookId);
+                if (book != null)
+                {
+                    book.Stock += item.Quantity.Value; // Reverse the stock deduction
+                }
+            }
+        }
+
+
 
         public List<CartItem> ExtractCartItem(string cookie)
         {
@@ -109,7 +149,7 @@ namespace BookStore.Services
 
             vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
             //vnpay.AddRequestData("vnp_TxnRef", order.OrderId.ToString()); // Mã tham chiếu của giao dịch tại hệ thống của merchant. Mã này là duy nhất dùng để phân biệt các đơn hàng gửi sang VNPAY. Không được trùng lặp trong ngày
-            vnpay.AddRequestData("vnp_TxnRef", tick); // Mã tham chiếu của giao dịch tại hệ thống của merchant. Mã này là duy nhất dùng để phân biệt các đơn hàng gửi sang VNPAY. Không được trùng lặp trong ngày
+            vnpay.AddRequestData("vnp_TxnRef", orderId.ToString()); // Mã tham chiếu của giao dịch tại hệ thống của merchant. Mã này là duy nhất dùng để phân biệt các đơn hàng gửi sang VNPAY. Không được trùng lặp trong ngày
 
 
             string paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
@@ -117,5 +157,36 @@ namespace BookStore.Services
             return paymentUrl;
 
         }
+
+        public Order UpdatePreference(string url)
+        {
+            var response = ParseVnPayResponse(url);
+            var order = _context.Orders.FirstOrDefault(e => e.OrderId == int.Parse(response.TxnRef));
+            order.Preferences = url;
+            _context.SaveChanges();
+            return order;
+        }
+        public VnPayResponseQuery ParseVnPayResponse(string url)
+        {
+            var uri = new Uri(url);
+            var queryParams = QueryHelpers.ParseQuery(uri.Query);
+
+            return new VnPayResponseQuery
+            {
+                Amount = long.Parse(queryParams["vnp_Amount"]),
+                BankCode = queryParams["vnp_BankCode"],
+                BankTranNo = queryParams["vnp_BankTranNo"],
+                CardType = queryParams["vnp_CardType"],
+                OrderInfo = Uri.UnescapeDataString(queryParams["vnp_OrderInfo"]),
+                PayDate = DateTime.ParseExact(queryParams["vnp_PayDate"], "yyyyMMddHHmmss", null),
+                ResponseCode = queryParams["vnp_ResponseCode"],
+                TmnCode = queryParams["vnp_TmnCode"],
+                TransactionNo = queryParams["vnp_TransactionNo"],
+                TransactionStatus = queryParams["vnp_TransactionStatus"],
+                TxnRef = queryParams["vnp_TxnRef"],
+                SecureHash = queryParams["vnp_SecureHash"]
+            };
+        }
+
     }
 }

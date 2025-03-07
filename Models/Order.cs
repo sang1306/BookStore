@@ -10,13 +10,15 @@ public partial class Order
 
     public int UserId { get; set; }
 
-    public OrderStatus? OrderStatus { get; set; } = Enums.OrderStatus.Pending;
+    public OrderStatus? OrderStatus { get; set; }
 
     public DateTime? OrderDate { get; set; }
 
     public string? Address { get; set; }
 
     public string? Phone { get; set; }
+
+    public string? Preferences { get; set; }
 
     public decimal? TotalAmount { get; set; }
 

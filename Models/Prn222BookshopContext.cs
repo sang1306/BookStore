@@ -6,9 +6,9 @@ namespace BookStore.Models;
 
 public partial class Prn222BookshopContext : DbContext
 {
-    public Prn222BookshopContext()
-    {
-    }
+    //public Prn222BookshopContext()
+    //{
+    //}
 
     public Prn222BookshopContext(DbContextOptions<Prn222BookshopContext> options)
         : base(options)
@@ -39,7 +39,7 @@ public partial class Prn222BookshopContext : DbContext
     {
         modelBuilder.Entity<Book>(entity =>
         {
-            entity.HasKey(e => e.BookId).HasName("PK__Books__3DE0C2276AA4C26F");
+            entity.HasKey(e => e.BookId).HasName("PK__Books__3DE0C22786688449");
 
             entity.Property(e => e.BookId).HasColumnName("BookID");
             entity.Property(e => e.Author)
@@ -67,7 +67,7 @@ public partial class Prn222BookshopContext : DbContext
 
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A2BFEE2DCAF");
+            entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A2BC2635B50");
 
             entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
             entity.Property(e => e.CategoryName).HasMaxLength(255);
@@ -75,7 +75,7 @@ public partial class Prn222BookshopContext : DbContext
 
         modelBuilder.Entity<Chat>(entity =>
         {
-            entity.HasKey(e => e.ChatId).HasName("PK__Chat__A9FBE626F9F9D964");
+            entity.HasKey(e => e.ChatId).HasName("PK__Chat__A9FBE62623921B2C");
 
             entity.ToTable("Chat");
 
@@ -99,7 +99,7 @@ public partial class Prn222BookshopContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAF1675D47E");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAF666FD07B");
 
             entity.Property(e => e.OrderId).HasColumnName("OrderID");
             entity.Property(e => e.OrderDate)
@@ -116,7 +116,7 @@ public partial class Prn222BookshopContext : DbContext
 
         modelBuilder.Entity<OrderDetail>(entity =>
         {
-            entity.HasKey(e => e.OrderDetailId).HasName("PK__OrderDet__D3B9D30C28FADA83");
+            entity.HasKey(e => e.OrderDetailId).HasName("PK__OrderDet__D3B9D30CD8A8A23A");
 
             entity.Property(e => e.OrderDetailId).HasColumnName("OrderDetailID");
             entity.Property(e => e.BookId).HasColumnName("BookID");
@@ -134,7 +134,7 @@ public partial class Prn222BookshopContext : DbContext
 
         modelBuilder.Entity<Review>(entity =>
         {
-            entity.HasKey(e => e.ReviewId).HasName("PK__Reviews__74BC79AE0917EFFF");
+            entity.HasKey(e => e.ReviewId).HasName("PK__Reviews__74BC79AEEB66F647");
 
             entity.Property(e => e.ReviewId).HasColumnName("ReviewID");
             entity.Property(e => e.BookId).HasColumnName("BookID");
@@ -154,7 +154,7 @@ public partial class Prn222BookshopContext : DbContext
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.RoleId).HasName("PK__Role__8AFACE3A2BF155A0");
+            entity.HasKey(e => e.RoleId).HasName("PK__Role__8AFACE3AA27BC1B4");
 
             entity.ToTable("Role");
 
@@ -164,11 +164,11 @@ public partial class Prn222BookshopContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCAC4BD6F654");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCAC96E81731");
 
-            entity.HasIndex(e => e.Username, "UQ__Users__536C85E46EEC4457").IsUnique();
+            entity.HasIndex(e => e.Username, "UQ__Users__536C85E4B6F613C9").IsUnique();
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D105344414AC54").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D1053483418118").IsUnique();
 
             entity.Property(e => e.UserId).HasColumnName("UserID");
             entity.Property(e => e.CreateAt)
@@ -193,7 +193,7 @@ public partial class Prn222BookshopContext : DbContext
                         .HasConstraintName("FK__Wishlist__UserID__5812160E"),
                     j =>
                     {
-                        j.HasKey("UserId", "BookId").HasName("PK__Wishlist__7456C08E60AE2BBD");
+                        j.HasKey("UserId", "BookId").HasName("PK__Wishlist__7456C08E61A8BDAA");
                         j.ToTable("Wishlist");
                         j.IndexerProperty<int>("UserId").HasColumnName("UserID");
                         j.IndexerProperty<int>("BookId").HasColumnName("BookID");
