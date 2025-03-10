@@ -16,6 +16,7 @@ builder.Services.AddDbContext<Prn222BookshopContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddTransient<AuthService>();
+builder.Services.AddTransient<OrderService>();
 builder.Services.AddTransient<MailService>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
 builder.Services.AddScoped<AdminFilter>();

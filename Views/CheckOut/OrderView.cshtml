@@ -1,0 +1,227 @@
+﻿@{
+}
+@* @ViewBag.username *@
+<style>
+	.stats-card {
+		padding: 20px;
+		border-radius: 10px;
+		margin-bottom: 30px;
+	}
+
+	.stats-number {
+		font-size: 2.5rem;
+		font-weight: 600;
+		margin-bottom: 5px;
+	}
+
+	.stats-label {
+		color: #6c757d;
+		font-size: 1rem;
+	}
+
+	.blue-text {
+		color: #4285F4;
+	}
+
+	.green-text {
+		color: #34A853;
+	}
+
+	.red-text {
+		color: #EA4335;
+	}
+
+	.orange-text {
+		color: #FBBC05;
+	}
+
+	.status-badge {
+		border-radius: 30px;
+		padding: 5px 15px;
+		font-size: 0.8rem;
+	}
+
+	.status-new {
+		background-color: #e8f0fe;
+		color: #4285F4;
+	}
+
+	.status-review {
+		background-color: #fff8e1;
+		color: #f57c00;
+	}
+
+	.status-hold {
+		background-color: #fce4ec;
+		color: #e91e63;
+	}
+
+	.status-paid {
+		background-color: #e0f2f1;
+		color: #009688;
+	}
+
+	.company-initial {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 600;
+		font-size: 0.8rem;
+	}
+
+	.initial-no {
+		background-color: #e8f0fe;
+		color: #4285F4;
+	}
+
+	.initial-cu {
+		background-color: #fff8e1;
+		color: #f57c00;
+	}
+
+	.initial-pp {
+		background-color: #fce4ec;
+		color: #e91e63;
+	}
+</style>
+<div class="container mt-5 " style="height:70vh">
+	<!-- Stats Cards -->
+	<div class="row mb-4">
+		<div class="col-md-3">
+			<div class="stats-card shadow-sm">
+				<div class="stats-number blue-text">0</div>
+				<div class="stats-label">Total Orders</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="stats-card shadow-sm">
+				<div class="stats-number green-text">0</div>
+				<div class="stats-label">Total Delivered</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="stats-card shadow-sm">
+				<div class="stats-number red-text">0</div>
+				<div class="stats-label">Pending Orders</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="stats-card shadow-sm">
+				<div class="stats-number orange-text">0</div>
+				<div class="stats-label">Orders Hold</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Add New Orders Button -->
+	<div class="d-flex justify-content-end mb-4">
+		<a asp-action="Index" asp-controller="Cart"
+		   class="btn btn-outline-primary px-4 rounded-pill ">Add New Orders</a>
+	</div>
+
+	<!-- Orders Table -->
+	<div class="card shadow-sm">
+		<div class="card-body p-0">
+			<div class="table-responsive">
+				<table class="table table-hover mb-0">
+					<thead class="bg-light">
+						<tr>
+							<th class="py-3 px-4">Order No</th>
+							<th class="py-3">Address</th>
+							<th class="py-3">Order Date</th>
+							<th class="py-3">Total Amount</th>
+							<th class="py-3">Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (BookStore.Models.Order order in ViewBag.orders)
+						{
+							<tr>
+								<td class="py-3 px-4">
+									<div class="d-flex align-items-center">
+										<div class="company-initial initial-no me-3">#@order.OrderId</div>
+										@* <span>Norde</span> *@
+									</div>
+								</td>
+								<td class="py-3">@order.Address</td>
+								<td class="py-3">@order.OrderDate.Value.ToString("MMMM dd, yyyy") </td>
+								<td class="py-3">@order.TotalAmount.Value.ToString("N0")</td>
+
+								@{
+									string badgeText = order.OrderStatus.ToString();
+									string badgeStyle = "";
+
+									switch (order.OrderStatus)
+									{
+										case BookStore.Enums.OrderStatus.Pending:
+											badgeStyle = "background-color: #fff8e1; color: #f57c00;";
+											break;
+										case BookStore.Enums.OrderStatus.Paid:
+											badgeStyle = "background-color: #e0f2f1; color: #009688;";
+											break;
+										case BookStore.Enums.OrderStatus.Processing:
+											badgeStyle = "background-color: #e8f0fe; color: #4285F4;";
+											break;
+										case BookStore.Enums.OrderStatus.Shipped:
+											badgeStyle = "background-color: #e8eaf6; color: #3f51b5;";
+											break;
+										case BookStore.Enums.OrderStatus.Completed:
+											badgeStyle = "background-color: #e8f5e9; color: #4caf50;";
+											break;
+										case BookStore.Enums.OrderStatus.Cancelled:
+											badgeStyle = "background-color: #fce4ec; color: #e91e63;";
+											break;
+										case BookStore.Enums.OrderStatus.Refunded:
+											badgeStyle = "background-color: #f3e5f5; color: #9c27b0;";
+											break;
+										case BookStore.Enums.OrderStatus.OutOfStock:
+											badgeStyle = "background-color: #ffebee; color: #f44336;";
+											badgeText = "Out of Stock";
+											break;
+									}
+								}
+
+								<td><span class="status-badge" style="@badgeStyle">@badgeText</span></td>
+								<td class="py-3">
+									<a asp-action="OrderDetail"
+									   asp-controller="CheckOut"
+									   asp-route-username="@ViewBag.username"
+									   asp-route-orderId="@order.OrderId"
+									   class="status-badge status-new">View</a>
+								</td>
+
+							</tr>
+						}
+					</tbody>
+				</table>
+				<nav aria-label="Page navigation">
+					<ul class="pagination justify-content-center mt-4">
+						@if (ViewBag.currentPage > 1)
+						{
+							<li class="page-item">
+								<a class="page-link" href="@Url.Action("OrderView", new { username = ViewBag.username, page = ViewBag.currentPage - 1 })">Previous</a>
+							</li>
+						}
+
+						@for (int i = 1; i <= ViewBag.totalPages; i++)
+						{
+							<li class="page-item @(i == ViewBag.currentPage ? "active" : "")">
+								<a class="page-link" href="@Url.Action("OrderView", new { username = ViewBag.username, page = i })">@i</a>
+							</li>
+						}
+
+						@if (ViewBag.currentPage < ViewBag.totalPages)
+						{
+							<li class="page-item">
+								<a class="page-link" href="@Url.Action("OrderView", new { username = ViewBag.username, page = ViewBag.currentPage + 1 })">Next</a>
+							</li>
+						}
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+</div>
