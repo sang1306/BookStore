@@ -1,0 +1,178 @@
+﻿@model BookStore.Dtos.OrderDto.OrderRequest
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+	ViewData["title"] = "Checkout Page";
+}
+<style>
+	.checkout-container {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 20px;
+	}
+
+	.product-image {
+		max-width: 200px;
+		height: auto;
+	}
+
+	.checkout-steps {
+		color: #888;
+		font-weight: bold;
+	}
+
+	.active-step {
+		color: black;
+	}
+</style>
+<div class="container checkout-container " style="min-height:70vh; display:flex; align-items: center; align-content:center">
+	<form class="row" asp-action="PlaceOrder" asp-controller="CheckOut">
+		<div class="col-md-8">
+			<div class="mb-4">
+				<h2 class="checkout-steps">
+					<span class="active-step">1 Enter Your Info</span>
+					<span class="ms-2">2 Payment Method</span>
+				</h2>
+			</div>
+
+			@* first name, last name, email, phone, city, street address   *@
+
+			<div class="container mt-5">
+				<div class="card mb-4">
+					<div class="card-body">
+						<div>
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label for="firstName" class="form-label">First Name*</label>
+									<input type="text" class="form-control" id="FirstName" asp-for="FirstName" required>
+									<span class="text-danger" asp-validation-for="FirstName"></span>
+								</div>
+								<div class="col-md-6 mb-3">
+									<label for="lastName" class="form-label">Last Name*</label>
+									<input type="text" class="form-control" id="LastName" asp-for="LastName" required>
+									<span class="text-danger" asp-validation-for="LastName"></span>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label for="Email" class="form-label">Email Address*</label>
+									<input type="email" class="form-control" id="Email" asp-for="Email" value="@ViewBag.User.Email" required>
+									<span class="text-danger" asp-validation-for="Email"></span>
+								</div>
+								<div class="col-md-6 mb-3">
+									<label for="Phone" class="form-label">Phone Number*</label>
+									<input type="tel" class="form-control" id="Phone" asp-for="Phone" required>
+									<span class="text-danger" asp-validation-for="Phone"></span>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label for="cityInput" class="form-label">City*</label>
+									<input type="text" class="form-control" id="cityInput" asp-for="City" required>
+									<span class="text-danger" asp-validation-for="City"></span>
+								</div>
+								<div class="col-md-6 mb-3">
+									<label for="streetAddress" class="form-label">Street Address*</label>
+									<input type="text" class="form-control" id="streetAddress" asp-for="StreetAdress" value="@ViewBag.User.Address" required>
+									<span class="text-danger" asp-validation-for="StreetAdress"></span>
+								</div>
+							</div>
+
+							<button class="btn btn-danger w-20" type="button">
+								Cancel
+							</button>
+							@* <div class="form-check mb-3"> 
+								<input class="form-check-input" type="checkbox" id="newsletterCheck" checked>
+								<label class="form-check-label" for="newsletterCheck">
+									Join our newsletter and receive 15% off your first full price purchase.
+								</label>
+							</div>
+
+							<button class="btn btn-dark w-100" type="submit">
+								CONTINUE TO SHIPPING
+							</button>
+							*@
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="col-md-4">
+			<div class="card">
+				<div class="card-body">
+					@* <div class="d-flex justify-content-between align-items-center mb-3"> 
+						<span class="badge bg-success">Discount - 15% off</span>
+						<span>Cart (1)</span>
+					</div>
+					*@
+
+					@foreach (BookStore.Dtos.OrderDto.CartItemDetail cart in ViewBag.CartItemBook)
+					{
+						<div class="d-flex mb-3">
+							<img src="@cart.Book.Image" alt="Product" class="product-image me-3">
+							<div>
+								<h6>@cart.Book.Title</h6>
+								<p class="text-muted small">quantity: @cart.Quantity </p>
+							</div>
+						</div>
+					}
+					@*<div class="mb-3">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Gift or promo code">
+							<button class="btn btn-outline-secondary" type="button">APPLY</button>
+						</div>
+					</div>*@	
+
+					<div class="border-top pt-3">
+						<div class="d-flex justify-content-between mb-2">
+							<span>Subtotal</span>
+							<span>@ViewBag.Subtotal đ</span>
+						</div>
+
+						@* <div class="d-flex justify-content-between mb-2 text-success"> 
+							<span>Welcome Offer - 15% Off</span>
+							<span>-$544,965.00</span>
+						</div>
+
+						<div class="d-flex justify-content-between mb-2">
+							<span>Duties</span>
+							<span>$616,044.78</span>
+						</div>
+						<div class="d-flex justify-content-between mb-2">
+							<span>Estimated Tax</span>
+							<span>$295,648.84</span>
+						</div>*@
+						<div class="d-flex justify-content-between mb-2">
+							<span>Estimated Shipping</span>
+							<span>35000 đ</span>
+						</div>
+						<div class="d-flex justify-content-between fw-bold border-top pt-2">
+							<span>Total</span>
+							<span>@ViewBag.Total đ</span>
+							<input type="hidden" asp-for="TotalAmount" value="@ViewBag.Total" />
+						</div>
+					</div>
+
+					<div class="alert alert-warning mt-3 small" role="alert">
+						Make your payment directly into Vnpay. Please use your Order ID as the payment reference. Your order won’t be shipped until the funds have cleared in our account.
+					</div>
+
+					<button class="btn btn-outline-secondary w-100 mt-3 flex" type="submit">
+
+						<img src="/image/vnpaylogo.svg" height="20" alt="SVG Image">
+						PLACE ORDER
+					</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}
+
