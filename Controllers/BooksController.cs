@@ -1,4 +1,6 @@
-﻿using BookStore.Models;
+﻿using BookStore.Dtos.Book;
+using BookStore.Models;
+using chat_application_demo.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +30,11 @@ namespace BookStore.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 1)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             var categories = await _context.Categories.ToListAsync();
             return View(categories);
         }
@@ -37,6 +44,11 @@ namespace BookStore.Controllers
         [Route("AddCategory")]
         public async Task<IActionResult> AddCategory(Category category)
         {
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 1)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             if (string.IsNullOrWhiteSpace(category.CategoryName))
             {
                 ModelState.AddModelError("", "Tên thể loại không được để trống!");
@@ -54,6 +66,11 @@ namespace BookStore.Controllers
         [Route("EditCategory")]
         public async Task<IActionResult> EditCategory(Category category)
         {
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 1)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             var existingCategory = await _context.Categories.FindAsync(category.CategoryId);
             if (existingCategory == null)
             {
@@ -73,6 +90,11 @@ namespace BookStore.Controllers
         [Route("DeleteCategory")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 1)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
@@ -91,6 +113,11 @@ namespace BookStore.Controllers
         [HttpGet]
         public async Task<IActionResult> AddBook(string searchTitle, int? categoryId, string sortOrder, int page = 1)
         {
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 1)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             int pageSize = 10; // Số sách trên mỗi trang
 
             var books = _context.Books.Include(b => b.Category).AsQueryable();
@@ -175,7 +202,11 @@ namespace BookStore.Controllers
         [Route("addNewBook")]
         public async Task<IActionResult> AddNewBook(Book book, IFormFile ImageFile)
         {
-
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 1)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
 
             try
             {
@@ -232,6 +263,11 @@ namespace BookStore.Controllers
         [Route("updateBook")]
         public async Task<IActionResult> UpdateBook(Book book, IFormFile ImageFile)
         {
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 1)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             try
             {
                 var existingBook = await _context.Books.FindAsync(book.BookId);
@@ -287,6 +323,11 @@ namespace BookStore.Controllers
         [Route("deleteBook")]
         public async Task<IActionResult> DeleteBook(int id)
         {
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 1)
+            {
+                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            }
             var existingBook = await _context.Books.FindAsync(id);
             if (existingBook == null)
             {
@@ -308,14 +349,38 @@ namespace BookStore.Controllers
         [HttpGet("Details/{id}")]
         public async Task<IActionResult> BookDetail(int id)
         {
-            var book = await _context.Books.FindAsync(id);
-            ViewBag.book = book;
+            //var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            //if (userSession == null || userSession.Role != 1)
+            //{
+            //    return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            //}
+
+            var book = await _context.Books.FirstOrDefaultAsync(b => b.BookId == id);
+            if (book == null)
+            {
+                return RedirectToAction("Index", "Books"); // Quay về danh sách sách nếu không tìm thấy
+            }
+            
+
+            var reviews = await _context.Reviews
+                .Where(r => r.BookId == id)
+                .Include(r => r.User)  // Load thông tin User
+                .ToListAsync();
+
+            double avgRating = reviews.Any() ? reviews.Average(r => r.Ratting) : 0;
+
+            ViewBag.Book = book; // Đổi 'book' thành 'Book' để khớp với View
+            ViewBag.Reviews = reviews;
+            ViewBag.AverageRating = Math.Round(avgRating, 1);
             ViewBag.Books = await GetRandomBooksAsync(3);
-            return View();
+
+            return View(book);
         }
+
 
         private async Task<List<Book>> GetRandomBooksAsync(int count = 4)
         {
+
             return await _context.Books
                 .OrderBy(x => Guid.NewGuid())
                 .Take(count)
