@@ -1,0 +1,180 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<style>
+	.cart-thumbnail {
+		max-width: 100px;
+		height: auto;
+	}
+
+	.quantity-input {
+		width: 60px;
+	}
+
+	.remove-item {
+		color: #6c757d;
+		cursor: pointer;
+	}
+
+		.remove-item:hover {
+			color: #dc3545;
+		}
+
+	.coupon-input {
+		max-width: 250px;
+	}
+
+	.cart-header {
+		border-bottom: 1px solid #dee2e6;
+		padding-bottom: 0.5rem;
+		margin-bottom: 1.5rem;
+	}
+</style>
+
+<div class="container py-5">
+	<div class="row">
+		<div class="col-12">
+			<h1 class="cart-header display-6 mb-4">Cart</h1>
+		</div>
+	</div>
+
+	<div class="row">
+		<!-- Cart Items Section - Left Column -->
+		<div class="col-lg-8 mb-4">
+			<div class="card mb-4 border-0 bg-light">
+				<div class="card-body p-0">
+					<table class="table mb-0">
+						<thead>
+							<tr class="table-light">
+								<th class="py-3">Thumbnail</th>
+								<th class="py-3">Product Title</th>
+								<th class="py-3">Price</th>
+								<th class="py-3">Quantity</th>
+								<th class="py-3">Total</th>
+								<th class="py-3"></th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (BookStore.Models.Book b in ViewBag.CartBooks)
+							{
+								<tr>
+									<td class="align-middle">
+										<img src="https://via.placeholder.com/80x100" alt="Book cover" class="cart-thumbnail">
+									</td>
+									<td class="align-middle">@b.Title</td>
+									<td class="align-middle">@b.Price ₫</td>
+									<td class="align-middle">
+										<input type="number" class="form-control quantity-input" value="1" min="1">
+									</td>
+									<td class="align-middle">395,000 ₫</td>
+									<td class="align-middle text-center">
+										<i class="bi bi-x-lg remove-item"></i>
+									</td>
+								</tr>
+							}
+
+							<!-- First Item -->
+							<tr>
+								<td class="align-middle">
+									<img src="https://via.placeholder.com/80x100" alt="Book cover" class="cart-thumbnail">
+								</td>
+								<td class="align-middle">The Color of Water: A Black Man's Tribute to His White Mother</td>
+								<td class="align-middle">395,000 ₫</td>
+								<td class="align-middle">
+									<input type="number" class="form-control quantity-input" value="1" min="1">
+								</td>
+								<td class="align-middle">395,000 ₫</td>
+								<td class="align-middle text-center">
+									<i class="bi bi-x-lg remove-item"></i>
+								</td>
+							</tr>
+							<!-- Second Item -->
+							<tr>
+								<td class="align-middle">
+									<img src="https://via.placeholder.com/80x100" alt="Book cover" class="cart-thumbnail">
+								</td>
+								<td class="align-middle">When Bad Things Happen to Good People</td>
+								<td class="align-middle">345,000 ₫</td>
+								<td class="align-middle">
+									<input type="number" class="form-control quantity-input" value="2" min="1">
+								</td>
+								<td class="align-middle">690,000 ₫</td>
+								<td class="align-middle text-center">
+									<i class="bi bi-x-lg remove-item"></i>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+
+			<div class="d-flex" style="">
+				<input type="text" class="form-control " placeholder="Coupon Code" style="width: 40%">
+				<button class="btn btn-success" type="button">Apply Coupon</button>
+			</div>
+
+			<!-- Coupon Section -->
+			@* <div class=" mt-4 mb-3"> *@
+			@* <div class="input-group coupon-input m-0"> *@
+			@* <input type="text" class="form-control " placeholder="Coupon Code" style=""> *@
+			@* <button class="btn btn-success" type="button">Apply Coupon</button> *@
+			@* </div> *@
+			@* </div> *@
+
+			<!-- Return to Shop Button -->
+			<div class="mt-4">
+				<a href="#" class="btn btn-outline-secondary">
+					<i class="bi bi-arrow-left me-2"></i>Return To Shop
+				</a>
+			</div>
+		</div>
+
+		<!-- Order Summary Section - Right Column -->
+		<div class="col-lg-4">
+			<div class="card border-0 shadow-sm">
+				<div class="card-body">
+					<h3 class="mb-4">Order Detail</h3>
+
+					<!-- Subtotal -->
+					<div class="d-flex justify-content-between mb-3">
+						<span>Subtotal</span>
+						<span class="fw-bold">1,085,000 ₫</span>
+					</div>
+
+					<!-- Shipping Options -->
+					<div class="mb-3">
+						<p class="mb-2">Shipping</p>
+						<div class="form-check mb-2">
+							<input class="form-check-input" type="radio" name="shipping" id="shipping1" checked>
+							<label class="form-check-label" for="shipping1">
+								Standard Shipping: 35,000 ₫
+							</label>
+						</div>
+						<div class="form-check mb-2">
+							<input class="form-check-input" type="radio" name="shipping" id="shipping2">
+							<label class="form-check-label" for="shipping2">
+								Local pickup (available at Bluish after 12pm of next working day)
+							</label>
+						</div>
+						<small class="text-muted">Shipping options will be updated during checkout.</small>
+					</div>
+
+					<hr>
+
+					<!-- Total -->
+					<div class="d-flex justify-content-between mb-4">
+						<span class="fw-bold">Total</span>
+						<span class="fw-bold">1,120,000 ₫</span>
+					</div>
+
+					<!-- Checkout Button -->
+					<button class="btn btn-success w-100 py-2">Go To Secure Checkout</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+

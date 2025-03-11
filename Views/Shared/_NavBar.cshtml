@@ -50,9 +50,9 @@ string logoIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='75' height='75
 			</ul>
 			<div class="d-flex">
 				<div class="icon-container">
-					<a href="#" class="nav-link">
+					<a asp-action="Cart" asp-controller="Orders"  class="nav-link">
 						@Html.Raw(cardIcon)
-						<span class="badge bg-success">0</span>
+						<span id="cart-count" class="badge bg-success">0</span>
 					</a>
 				</div>
 				<div class="icon-container">

@@ -356,7 +356,11 @@ namespace BookStore.Controllers
             }
 
             var book = await _context.Books.FirstOrDefaultAsync(b => b.BookId == id);
-            if (book == null) return NotFound();
+            if (book == null)
+            {
+                return RedirectToAction("Index", "Books"); // Quay về danh sách sách nếu không tìm thấy
+            }
+            
 
             var reviews = await _context.Reviews
                 .Where(r => r.BookId == id)
@@ -365,11 +369,11 @@ namespace BookStore.Controllers
 
             double avgRating = reviews.Any() ? reviews.Average(r => r.Ratting) : 0;
 
-            ViewBag.book = book;
+            ViewBag.Book = book; // Đổi 'book' thành 'Book' để khớp với View
             ViewBag.Reviews = reviews;
             ViewBag.AverageRating = Math.Round(avgRating, 1);
 
-            return View(book); // Truyền book vào View để dễ truy cập
+            return View(book);
         }
 
 

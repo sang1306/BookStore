@@ -34,19 +34,39 @@ namespace BookStore.Controllers
             {
                 return RedirectToAction("AccessDenied", "Home");
             }
+            model.UserId = userSession.UserId;
 
-            if (ModelState.IsValid)
+            _context.Reviews.Add(model);
+            _context.SaveChanges();
+
+            return RedirectToAction("Details", "Books", new { id = model.BookId });
+        }
+
+        [HttpPost]
+        public IActionResult Delete(int reviewId)
+        {
+            var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            if (userSession == null || userSession.Role != 1)
             {
-                model.CreateAt = DateTime.Now; // Gán ngày tạo
-                _context.Reviews.Add(model);
-                _context.SaveChanges();
-
-                // QUAY LẠI TRANG CHI TIẾT SÁCH SAU KHI GỬI ĐÁNH GIÁ
-                return RedirectToAction("Details", "Books", new { id = model.BookId });
+                return RedirectToAction("AccessDenied", "Home");
             }
 
-            // NẾU DỮ LIỆU KHÔNG HỢP LỆ, Ở LẠI TRANG CHI TIẾT SÁCH
-            return RedirectToAction("Details", "Books", new { id = model.BookId });
+            var review = _context.Reviews.FirstOrDefault(r => r.ReviewId == reviewId);
+            if (review == null)
+            {
+                return NotFound();
+            }
+
+            // Chỉ cho phép người dùng xóa review của chính họ
+            if (review.UserId != userSession.UserId)
+            {
+                return Forbid();
+            }
+
+            _context.Reviews.Remove(review);
+            _context.SaveChanges();
+
+            return RedirectToAction("Details", "Books", new { id = review.BookId });
         }
 
     }
