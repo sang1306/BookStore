@@ -349,11 +349,11 @@ namespace BookStore.Controllers
         [HttpGet("Details/{id}")]
         public async Task<IActionResult> BookDetail(int id)
         {
-            var userSession = UserSessionManager.GetUserInfo(HttpContext);
-            if (userSession == null || userSession.Role != 1)
-            {
-                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
-            }
+            //var userSession = UserSessionManager.GetUserInfo(HttpContext);
+            //if (userSession == null || userSession.Role != 1)
+            //{
+            //    return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+            //}
 
             var book = await _context.Books.FirstOrDefaultAsync(b => b.BookId == id);
             if (book == null)
@@ -372,6 +372,7 @@ namespace BookStore.Controllers
             ViewBag.Book = book; // Đổi 'book' thành 'Book' để khớp với View
             ViewBag.Reviews = reviews;
             ViewBag.AverageRating = Math.Round(avgRating, 1);
+            ViewBag.Books = await GetRandomBooksAsync(3);
 
             return View(book);
         }

@@ -1,4 +1,5 @@
 ﻿using BookStore.Dtos.Book;
+using BookStore.Filters;
 using BookStore.Models;
 using chat_application_demo.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,7 @@ namespace BookStore.Controllers
             return View(reviews);
         }
 
+        [TypeFilter(typeof(AuthenticationFilter))]
         [HttpPost]
         public IActionResult Create(Review model)
         {
@@ -42,6 +44,7 @@ namespace BookStore.Controllers
             return RedirectToAction("Details", "Books", new { id = model.BookId });
         }
 
+        [TypeFilter(typeof(AuthenticationFilter))]
         [HttpPost]
         public IActionResult Delete(int reviewId)
         {

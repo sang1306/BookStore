@@ -60,7 +60,7 @@
 						</div>
 					</div>
 				}
-				
+
 				<form id="addtocardForm" method="post" action="/AddToCart"
 					  class="flex" style="display: flex; gap:10px; ">
 					<input type="hidden" name="bookId" value="@ViewBag.book.BookId" />
@@ -69,71 +69,103 @@
 				</form>
 			</div>
 
+			<div class="border rounded p-4 mb-4 shadow-sm">
 
-			<form asp-controller="Review" asp-action="Create" method="post">
-				<input type="hidden" name="BookId" value="@ViewBag.Book.BookId" />
+				<form asp-controller="Review" asp-action="Create" method="post">
+					<input type="hidden" name="BookId" value="@ViewBag.Book.BookId" />
 
-				<div class="mb-3">
-					<label class="form-label">Đánh giá (1-5 sao)</label>
-					<select name="Ratting" class="form-control">
-						<option value="1">⭐</option>
-						<option value="2">⭐⭐</option>
-						<option value="3">⭐⭐⭐</option>
-						<option value="4">⭐⭐⭐⭐</option>
-						<option value="5">⭐⭐⭐⭐⭐</option>
-					</select>
-				</div>
+					<div class="mb-3">
+						<label class="form-label">Review (1-5 start)</label>
+						<select name="Ratting" class="form-control">
+							<option value="1">⭐</option>
+							<option value="2">⭐⭐</option>
+							<option value="3">⭐⭐⭐</option>
+							<option value="4">⭐⭐⭐⭐</option>
+							<option value="5">⭐⭐⭐⭐⭐</option>
+						</select>
+					</div>
 
-				<div class="mb-3">
-					<label class="form-label">Nhận xét</label>
-					<textarea name="Comment" class="form-control"></textarea>
-				</div>
+					<div class="mb-3">
+						<label class="form-label">Reviews</label>
+						<textarea name="Comment" class="form-control"></textarea>
+					</div>
 
-				<button type="submit" class="btn btn-primary">Gửi đánh giá</button>
-			</form>
-			<h3>Đánh giá từ người dùng</h3>
+					<button type="submit" class="btn btn-primary">Submit a review</button>
+				</form>
+			</div>
+			<div class="border rounded p-4 shadow-sm">
+				<h3>User Reviews</h3>
 
-			@{
-				var userSession = UserSessionManager.GetUserInfo(Context);
-			}
+				@{
+					var userSession = UserSessionManager.GetUserInfo(Context);
+				}
 
-			@if (ViewBag.Reviews != null && ViewBag.Reviews.Count > 0)
-			{
-				@foreach (var review in ViewBag.Reviews)
+				@if (ViewBag.Reviews != null && ViewBag.Reviews.Count > 0)
 				{
-					<div class="border p-3 mb-2">
-						<strong>@review.User.Username</strong> - @review.CreateAt.ToString("dd/MM/yyyy")
+					@foreach (var review in ViewBag.Reviews)
+					{
+						<div class="border p-3 mb-2">
+							<strong>@review.User.Username</strong> - @review.CreateAt.ToString("dd/MM/yyyy")
 
-						<!-- Hiển thị sao -->
-						<span class="text-warning">
-							@for (int i = 0; i < review.Ratting; i++)
+							<!-- Hiển thị sao -->
+							<span class="text-warning">
+								@for (int i = 0; i < review.Ratting; i++)
+								{
+									<i class="bi bi-star-fill"></i>
+								}
+							</span>
+
+							<p>@review.Comment</p>
+
+							<!-- Nếu người dùng đang đăng nhập là chủ sở hữu review, hiển thị nút xóa -->
+							@if (userSession != null && userSession.UserId == review.UserId)
 							{
-								<i class="bi bi-star-fill"></i>
+								<form asp-controller="Review" asp-action="Delete" method="post" class="d-inline">
+									<input type="hidden" name="reviewId" value="@review.ReviewId" />
+									<button type="submit" class="btn btn-danger btn-sm"
+											onclick="return confirm('Are you sure you want to delete this review?');">
+										Delete
+									</button>
+								</form>
 							}
-						</span>
-
-						<p>@review.Comment</p>
-
-						<!-- Nếu người dùng đang đăng nhập là chủ sở hữu review, hiển thị nút xóa -->
-						@if (userSession != null && userSession.UserId == review.UserId)
-						{
-							<form asp-controller="Review" asp-action="Delete" method="post" class="d-inline">
-								<input type="hidden" name="reviewId" value="@review.ReviewId" />
-								<button type="submit" class="btn btn-danger btn-sm"
-										onclick="return confirm('Bạn có chắc muốn xóa đánh giá này?');">
-									Xóa
-								</button>
-							</form>
-						}
+						</div>
+					}
+				}
+				else
+				{
+					<p>There are no reviews yet.</p>
+				}
+			</div>
+		</div>
+		<div style="font-size:30px; font-weight:bold">You might also like</div>
+		<div id="container01">
+			<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4  g-4 gap-3 mt-2"
+				 style="display: flex; justify-content:center">
+				@* @for (int i = 1; i <= 6; i++) *@
+				@foreach (BookStore.Models.Book b in ViewBag.Books)
+				{
+					<div class="col card-container">
+						<div class="card h-100 border-0" style="width: 18rem;">
+							<div style="overflow: hidden;">
+								<img src="@b.Image" class="card-img-top z-0" alt="...">
+							</div>
+							<div class="card-body">
+								<h5 class="card-title">@b.Title</h5>
+								<p class="card-text">@b.Author</p>
+								<p class="">@b.Price ₫</p>
+								<a asp-action="BookDetail" asp-controller="Books" asp-route-id="@b.BookId" class="btn btn-primary">Read More</a>
+							</div>
+						</div>
 					</div>
 				}
-			}
-			else
-			{
-				<p>Chưa có đánh giá nào.</p>
-			}
+			</div>
+		</div>
+
+
 	</div>
+
 </div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 <script>
 		$(document).ready(function() {
 		$("#addtocardForm").submit(function(e) {
@@ -157,7 +189,4 @@
 		});
 	});
 
-		</div>
-	</div>
-</div>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+</script>
