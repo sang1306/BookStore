@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BookStore.Enums;
 
 namespace BookStore.Models;
 
@@ -9,9 +10,15 @@ public partial class Order
 
     public int UserId { get; set; }
 
-    public int? OrderStatus { get; set; }
+    public OrderStatus? OrderStatus { get; set; }
 
     public DateTime? OrderDate { get; set; }
+
+    public string? Address { get; set; }
+
+    public string? Phone { get; set; }
+
+    public string? Preferences { get; set; }
 
     public decimal? TotalAmount { get; set; }
 

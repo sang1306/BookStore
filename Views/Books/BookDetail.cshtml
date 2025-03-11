@@ -60,9 +60,11 @@
 						</div>
 					</div>
 				}
-
-				<form class="flex" style="display: flex; gap:10px;">
-					<input class="form-control" style="width:100px" type="number" name="numOfBooks" />
+				
+				<form id="addtocardForm" method="post" action="/AddToCart"
+					  class="flex" style="display: flex; gap:10px; ">
+					<input type="hidden" name="bookId" value="@ViewBag.book.BookId" />
+					<input class="form-control" style="width:100px" type="number" name="quantity" value="1" min="1" />
 					<input class="form-control btn btn-secondary" type="submit" value="Add To Cart" />
 				</form>
 			</div>
@@ -130,7 +132,30 @@
 			{
 				<p>Chưa có đánh giá nào.</p>
 			}
+	</div>
+</div>
+<script>
+		$(document).ready(function() {
+		$("#addtocardForm").submit(function(e) {
+			e.preventDefault(); // avoid executing the actual submit of the form
+			var form = $(this);
+			var actionUrl = form.attr('action');
 
+			$.ajax({
+				type: "POST",
+				url: actionUrl,
+				data: form.serialize(), // serializes the form's elements
+				success: function(response) {
+					if(response.success) {
+						// $("#cart-count").text(response.cartCount);
+						alert("Item added to cart successfully!");
+						$("input[name='quantity']").val(1);
+						loadCartCount();
+					}
+				}
+			});
+		});
+	});
 
 		</div>
 	</div>
