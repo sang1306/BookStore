@@ -25,10 +25,10 @@
 		var userInfo = UserSessionManager.GetUserInfo(ViewContext.HttpContext);
 		var isAdmin = userInfo?.Role == (int)Roles.Admin;
 	}
-
+	@await Html.PartialAsync("_Navbar")
 	@if (userInfo == null || !isAdmin)
 	{
-		@await Html.PartialAsync("_Navbar")
+		
 	}
 
 	@RenderBody()
