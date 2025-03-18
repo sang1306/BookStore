@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using BookStore.Filters;
 using BookStore.Models;
+using chat_application_demo.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,13 +22,25 @@ namespace PRN222_Project_1.Controllers
 
         public async Task<IActionResult> Index()
         {
+
+            var user = UserSessionManager.GetUserInfo(HttpContext);
+            if (user != null)
+            {
+                if (user.Role == (int)BookStore.Enums.Roles.Admin)
+                {
+                    return RedirectToAction("Index", "Admin");
+                }
+            }
+
             var listBooks = await GetRandomBooksAsync(6);
             ViewBag.Books = listBooks;
 
             var listBooksNewArivall = await GetRecentBooksAsync(6);
             ViewBag.ListBooksNewArivall = listBooksNewArivall;
+
             return View();
         }
+
 
         public IActionResult Privacy()
         {
@@ -58,7 +71,7 @@ namespace PRN222_Project_1.Controllers
         private async Task<List<Book>> GetRecentBooksAsync(int count = 4)
         {
             return await _context.Books
-                .OrderByDescending(x=> x.CreatedAt)
+                .OrderByDescending(x => x.CreatedAt)
                 .Take(count)
                 .ToListAsync();
         }

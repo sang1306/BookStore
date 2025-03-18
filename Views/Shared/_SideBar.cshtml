@@ -1,0 +1,164 @@
+﻿<style>
+	.sidebar {
+		background-color: #87CEEB; /* Màu xanh da trời */
+		height: 100vh;
+		padding-top: 20px;
+	}
+
+		.sidebar .nav-link {
+			color: #fff; /* Màu chữ trắng */
+			text-align: center;
+			padding: 15px;
+			border-radius: 5px;
+			font-weight: bold;
+		}
+
+			.sidebar .nav-link:hover {
+				background-color: #4682B4; /* Màu xanh dương đậm hơn khi hover */
+			}
+
+			.sidebar .nav-link.active {
+				background-color: #1E90FF; /* Màu xanh da trời đậm khi được chọn */
+			}
+
+	.nav-item .btn-signout {
+		background: none;
+		border: none;
+		color: #dc3545; /* Màu đỏ tương tự như nút sign-out */
+		padding: 0;
+		font-size: 1rem;
+		cursor: pointer;
+		text-decoration: none; /* Loại bỏ gạch chân */
+		transition: color 0.3s ease-in-out;
+	}
+
+		.nav-item .btn-signout:hover {
+			color: #a71d2a; /* Màu đỏ đậm hơn khi hover */
+		}
+
+</style>
+
+<style>
+	/* Vùng trigger */
+	.sidebar-trigger {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 6.6vw;
+		height: 100vh;
+		z-index: 1000;
+	}
+
+	/* Sidebar ẩn */
+	.sidebar {
+		position: fixed;
+		left: -250px; /* Ẩn bên ngoài */
+		top: 0;
+		width: 250px;
+		height: 100vh;
+		/* background-color: #343a40; */
+		color: white;
+		transition: left 0.3s ease-in-out;
+		z-index: 1100; /* Đè lên các thành phần khác */
+		padding-top: 20px;
+	}
+
+		/* Khi hover vào vùng trigger => Hiện sidebar */
+		.sidebar-trigger:hover + .sidebar,
+		.sidebar:hover {
+			left: 0;
+		}
+
+</style>
+
+<!-- Sidebar -->
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+	<!-- Sidebar - Brand -->
+	<!-- Divider -->
+	<hr class="sidebar-divider my-0">
+
+	<!-- Nav Item - Dashboard -->
+	<!-- Divider -->
+	<hr class="sidebar-divider">
+
+	<!-- Heading -->
+	<div class="sidebar-heading">
+		Interface
+	</div>
+
+	<!-- Trigger vùng ẩn -->
+	<div class="sidebar-trigger"></div>
+
+	<!-- Sidebar -->
+	<nav class="sidebar">
+		<div class="sidebar-header">
+			<h3 class="mb-0">Admin Panel</h3>
+		</div>
+
+		<ul class="sidebar-nav flex-column">
+			<li class="nav-item">
+				<a class="nav-link" href="Category.html">
+					<i class="fas fa-fw fa-chart-area"></i>
+					<span>Category</span>
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" asp-action="AddBook" asp-controller="Books">
+					<i class="fas fa-fw fa-chart-area"></i>
+					<span>Books</span>
+				</a>
+			</li>
+
+			<li class="nav-item">
+				<a class="nav-link" asp-action="Index" asp-controller="Admin">
+					<i class="fas fa-fw fa-table"></i>
+					<span>Account</span>
+				</a>
+			</li>
+
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="booksDropdown" role="button" data-bs-toggle="dropdown">
+					Account
+				</a>
+				<ul class="dropdown-menu">
+					<li><a class="dropdown-item" asp-action="Index" asp-controller="Admin">Alls account</a></li>
+					<li><a class="dropdown-item" asp-action="Create" asp-controller="Admin">Add new account</a></li>
+				</ul>
+
+			</li>
+			<li>
+				<a class="nav-link text-danger" href="javascript:void(0);" onclick="handleSignOut()">
+					<i class="fas fa-sign-out-alt"></i> Sign Out
+				</a>
+			</li>
+		</ul>
+	</nav>
+
+	<!-- Divider -->
+	<hr class="sidebar-divider d-none d-md-block">
+
+	<!-- Sidebar Toggler (Sidebar) -->
+	<div class="text-center d-none d-md-inline">
+		<button class="rounded-circle border-0" id="sidebarToggle"></button>
+	</div>
+
+</ul>
+<script>
+			document.addEventListener("DOMContentLoaded", function () {
+		let sidebar = document.querySelector(".sidebar");
+		let trigger = document.querySelector(".sidebar-trigger");
+
+		// Khi di chuột vào trigger, mở sidebar
+		trigger.addEventListener("mouseenter", function () {
+			sidebar.classList.add("active");
+		});
+
+		// Khi di chuột ra khỏi sidebar, ẩn sidebar
+		sidebar.addEventListener("mouseleave", function () {
+			sidebar.classList.remove("active");
+		});
+	});
+</script>
+
+
