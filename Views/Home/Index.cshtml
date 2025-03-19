@@ -166,9 +166,10 @@
 		@foreach (BookStore.Models.Book b in ViewBag.Books)
 		{
 			<div class="col card-container">
-				<button class="btn btn-outline-danger btn-love z-3  btn-circle">
+				<button class="btn btn-outline-danger btn-love z-3 btn-circle" data-bookid="@b.BookId" onclick="addToWishList(@b.BookId)">
 					@Html.Raw(loveIcon)
 				</button>
+
 				<div class="card h-100 border-0" style="width: 18rem;">
 					<div style="overflow: hidden;">
 						<img src="@b.Image" class="card-img-top z-0" alt="...">

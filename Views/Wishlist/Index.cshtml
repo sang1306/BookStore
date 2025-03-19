@@ -1,0 +1,67 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<!-- Main Content -->
+<div class="container my-5">
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<h1>My Wishlist</h1>
+		<div>
+			<button class="btn btn-danger" id="clear-wishlist">
+				<i class="fas fa-trash me-1"></i> Clear All
+			</button>
+		</div>
+	</div>
+
+	<!-- Wishlist Content -->
+	<div id="wishlist-content">
+		<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+			@foreach (BookStore.Models.Book book in ViewBag.Books)
+			{
+				<div class="col">
+					<div class="card h-100 wishlist-card">
+						<div class="position-relative">
+							<img src="@book.Image" class="card-img-top book-cover" alt="Book Cover">
+							<button class="btn btn-danger btn-sm rounded-circle btn-remove">
+								<i class="fas fa-times"></i>
+							</button>
+						</div>
+						<div class="card-body">
+							<h5 class="card-title">@book.Title</h5>
+							<p class="card-text text-muted">@book.Author</p>
+							<div class="d-flex justify-content-between align-items-center">
+								<span class="fw-bold">@book.Price ₫</span>
+								<div>
+									@* <button class="btn btn-primary btn-sm"> *@
+									@* 	<i class="fas fa-shopping-cart me-1"></i> Add to Cart *@
+									@* </button> *@
+									<form id="addtocardForm" method="post" action="/AddToCart"
+										  class="flex" style="display: flex; gap:10px; ">
+										<input type="hidden" name="bookId" value="@book.BookId" />
+										<input class="form-control" style="width:100px" type="hidden" name="quantity" value="1" min="1" />
+										<input class="form-control btn btn-secondary" type="submit" value="Add To Cart" />
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+			}
+		</div>
+	</div>
+
+	<!-- Empty Wishlist (Initially Hidden) -->
+	<div id="empty-wishlist" class="text-center d-none empty-wishlist d-flex flex-column justify-content-center align-items-center">
+		<i class="fas fa-heart-broken text-muted" style="font-size: 5rem;"></i>
+		<h3 class="mt-4">Your wishlist is empty</h3>
+		<p class="text-muted">Browse our collection and add books you love to your wishlist!</p>
+		<a href="#" class="btn btn-primary mt-3">
+			<i class="fas fa-book me-1"></i> Browse Books
+		</a>
+	</div>
+</div>
+
+
