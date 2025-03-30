@@ -21,7 +21,6 @@ namespace BookStore.Controllers
         }
 
 
-        //[TypeFilter(typeof(AuthenticationFilter))]
         [Route("Index")]
         public IActionResult Index()
         {
@@ -34,22 +33,7 @@ namespace BookStore.Controllers
         public async Task<IActionResult> Login(UserLoginRequest login)
         {
             UserLoginResponse response = await _userService.UserLogin(login, HttpContext);
-            //if (response == null || !response.Success)
-            //{
-            //    return Unauthorized(new { message = "Sai tài khoản hoặc mật khẩu" });
-            //}
-
-            //var claims = new List<Claim>
-            //{
-            //new Claim(ClaimTypes.Name, response.Username),
-            //new Claim(ClaimTypes.Role, response.Role.ToString())
-            //};
-
-            //var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            //var authProperties = new AuthenticationProperties { IsPersistent = true };
-
-            //await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-            //    new ClaimsPrincipal(claimsIdentity), authProperties);
+   
             return Json(response);
         }
 

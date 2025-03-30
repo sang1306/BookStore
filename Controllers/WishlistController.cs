@@ -1,4 +1,5 @@
-﻿using BookStore.Models;
+﻿using BookStore.Filters;
+using BookStore.Models;
 using chat_application_demo.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace BookStore.Controllers
         {
             _context = context;
         }
+        [TypeFilter(typeof(AdminFilter))]
         public IActionResult Index()
         {
 
@@ -52,7 +54,6 @@ namespace BookStore.Controllers
                 return Unauthorized();
             }
 
-
             Book b = _context.Books.FirstOrDefault(b => b.BookId == bookId);
             if (b == null)
             {
@@ -68,5 +69,27 @@ namespace BookStore.Controllers
 
             return Ok();
         }
+        [HttpDelete("/wishlist/{bookId}")]
+        public ActionResult DeleteWishList(int bookId)
+        {
+            var user = UserSessionManager.GetUserInfo(HttpContext);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+            Book b = _context.Books.FirstOrDefault(b => b.BookId == bookId);
+            if (b == null)
+            {
+                return NotFound();
+            }
+            User u = _context.Users.Include(u => u.Books).FirstOrDefault(u => u.UserId == user.UserId);
+            if (u != null)
+            {
+                u.Books.Remove(b);
+                _context.SaveChanges();
+            }
+            return Ok($"Remove book {b.Title} successfully!");
+        }
+
     }
 }

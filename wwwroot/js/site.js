@@ -69,6 +69,17 @@ function addToWishList(bookId) {
         }
     });
 }
+function removeWishList(bookId) {
+    $.ajax({
+        type: "delete",
+        url: `/wishlist/${bookId}`,
+        success: function (response) {
+            console.log(response);
+            alert(response);
+            window.location.reload();
+        }
+    });
+}
 
 
 function removeFromCart(bookId) {
