@@ -19,14 +19,12 @@ namespace BookStore.Controllers.AdminController
             _context = context;
         }
 
-       
-        
         public async Task<IActionResult> Index(int? page)
         {
             var userSession = UserSessionManager.GetUserInfo(HttpContext);
             if (userSession == null || userSession.Role != 3)
             {
-                return RedirectToAction("AccessDenied", "Home"); // Chuyển hướng tới trang báo lỗi
+                return RedirectToAction("AccessDenied", "Home"); 
             }
             int pageNumber = (page ?? 1); 
             int pageSize = 8;

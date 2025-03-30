@@ -1,0 +1,91 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+	ViewData["Title"] = "Wish List";
+	string unloveIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-heart-crack'><path d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z' /><path d='m12 13-1-1 2-2-3-3 2-2' /></svg>";
+	string loveIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-heart'><path d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z' /></svg>";
+
+}
+<link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+
+<!-- Main Content -->
+<div class="container my-5">
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<h1>My Wishlist</h1>
+		<div>
+			<button class="btn btn-danger" id="clear-wishlist">
+				<i class="fas fa-trash me-1"></i> Clear All
+			</button>
+		</div>
+	</div>
+
+	<!-- Wishlist Content -->
+	<div id="wishlist-content">
+		<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+			@foreach (BookStore.Models.Book b in ViewBag.Books)
+			{
+				<div class="col card-container">
+					<button class="btn btn-outline-danger btn-love z-3 btn-circle" data-bookid="@b.BookId" onclick="removeWishList(@b.BookId)">
+						@Html.Raw(unloveIcon)
+					</button>
+
+					<div class="card h-100 border-0" style="width: 18rem;">
+						<div style="overflow: hidden;">
+							<img src="@b.Image" class="card-img-top z-0" alt="...">
+						</div>
+						<div class="card-body">
+							<h5 class="card-title">@b.Title</h5>
+							<p class="card-text">@b.Author</p>
+							<p class="">@b.Price ₫</p>
+							<a asp-action="BookDetail" asp-controller="Books" asp-route-id="@b.BookId" class="btn btn-primary">Read More</a>
+						</div>
+					</div>
+				</div>
+				@*<div class="col">
+					<div class="card h-100 wishlist-card">
+						<div class="position-relative">
+							<img src="@book.Image" class="card-img-top book-cover" alt="Book Cover">
+							<button class="btn btn-danger btn-sm rounded-circle btn-remove">
+								<i class="fas fa-times"></i>
+							</button>
+						</div>
+						<div class="card-body">
+							<h5 class="card-title">@book.Title</h5>
+							<p class="card-text text-muted">@book.Author</p>
+							<div class="d-flex justify-content-between align-items-center">
+								<span class="fw-bold">@book.Price ₫</span>
+								<div>
+									<form id="addtocardForm" method="post" action="/AddToCart"
+										  class="flex" style="display: flex; gap:10px; ">
+										<input type="hidden" name="bookId" value="@book.BookId" />
+										<input class="form-control" style="width:100px" type="hidden" name="quantity" value="1" min="1" />
+										<input class="form-control btn btn-secondary" type="submit" value="Add To Cart" />
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				*@
+
+
+			}
+		</div>
+	</div>
+
+	<!-- Empty Wishlist (Initially Hidden) -->
+	<div id="empty-wishlist" class="text-center d-none empty-wishlist d-flex flex-column justify-content-center align-items-center">
+		<i class="fas fa-heart-broken text-muted" style="font-size: 5rem;"></i>
+		<h3 class="mt-4">Your wishlist is empty</h3>
+		<p class="text-muted">Browse our collection and add books you love to your wishlist!</p>
+		<a href="#" class="btn btn-primary mt-3">
+			<i class="fas fa-book me-1"></i> Browse Books
+		</a>
+	</div>
+</div>
+
+
+<script>
+
+</script>

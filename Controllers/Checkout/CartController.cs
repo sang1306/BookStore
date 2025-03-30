@@ -1,4 +1,5 @@
 ﻿using BookStore.Dtos.OrderDto;
+using BookStore.Filters;
 using BookStore.Models;
 using BookStore.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookStore.Controllers.Checkout
 {
 
+    [TypeFilter(typeof(AuthenticationFilter))]
     public class CartController : Controller
     {
         private readonly OrderService _service;
@@ -52,7 +54,7 @@ namespace BookStore.Controllers.Checkout
         }
 
 
-    
+
         [HttpPost("AddTocart")]
         public IActionResult AddToCart(int bookId, int quantity = 1)
         {

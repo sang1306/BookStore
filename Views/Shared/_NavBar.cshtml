@@ -18,22 +18,16 @@
 		</button>
 		<div class="collapse navbar-collapse" id="navbarNav">
 			<ul class="navbar-nav mx-auto">
-				<li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
-				<li class="nav-item"><a class="nav-link" href="#">Our Locations</a></li>
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="booksDropdown" role="button" data-bs-toggle="dropdown">
+					<a class="nav-link " asp-action="ListBook" asp-controller="HomePage" id="booksDropdown">
 						All Books
 					</a>
-					<ul class="dropdown-menu">
-						<li><a class="dropdown-item" href="#">Fiction</a></li>
-						<li><a class="dropdown-item" href="#">Non-Fiction</a></li>
-						<li><a class="dropdown-item" href="#">Children's Books</a></li>
-					</ul>
 				</li>
 				<li class="nav-item"><a class="nav-link" href="#">Book Exchange</a></li>
 
 				@if (UserSessionManager.GetUserInfo(ViewContext.HttpContext) != null)
 				{
+
 					<li class="nav-item"><a class="nav-link" asp-action="OrderView" asp-controller="CheckOut" asp-route-username="@UserSessionManager.GetUserInfo(ViewContext.HttpContext).Username">Customer Order</a></li>
 
 					<li class="nav-item"><a class="nav-link text-success" href="#">My Account</a></li>
@@ -54,12 +48,16 @@
 						<span id="cart-count" class="badge bg-success">0</span>
 					</a>
 				</div>
-				<div class="icon-container">
-					<a href="#" class="nav-link">
-						@Html.Raw(wishListIcon)
-						<span class="badge bg-success">0</span>
-					</a>
-				</div>
+				@if (UserSessionManager.GetUserInfo(ViewContext.HttpContext) != null)
+				{
+
+					<div class="icon-container">
+						<a asp-action="Index" asp-controller="wishlist" class="nav-link">
+							@Html.Raw(wishListIcon)
+							<span class="badge bg-success">0</span>
+						</a>
+					</div>
+				}
 			</div>
 		</div>
 	</div>

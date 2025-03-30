@@ -1,0 +1,269 @@
+﻿@{
+
+	string logoutIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-log-out'><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/><polyline points='16 17 21 12 16 7'/><line x1='21' x2='9' y1='12' y2='12'/></svg>";
+}
+<style>
+	/* Base styles for sidebar */
+	.sidebar-trigger {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 6.6vw;
+		height: 100vh;
+		z-index: 1000;
+	}
+
+	.sidebar {
+		position: fixed;
+		left: -250px; /* Hidden initially */
+		top: 0;
+		width: 250px;
+		height: 100vh;
+		background-color: rgba(50, 56, 29, 0.8); /* Green with 60% opacity */
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		color: white;
+		transition: left 0.3s ease-in-out;
+		z-index: 1100;
+		padding-top: 20px;
+		box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+		border-right: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+		/* Show sidebar on hover */
+		.sidebar-trigger:hover + .sidebar,
+		.sidebar:hover {
+			left: 0;
+		}
+
+	/* Navigation styles */
+	.sidebar-header {
+		padding: 0 20px 20px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		margin-bottom: 15px;
+	}
+
+	.sidebar-nav {
+		list-style-type: none;
+		padding: 0 10px;
+		margin: 0;
+	}
+
+	.nav-item {
+		margin-bottom: 5px;
+	}
+
+	.nav-link {
+		display: flex;
+		align-items: center;
+		padding: 12px 15px;
+		color: rgba(255, 255, 255, 0.9);
+		text-decoration: none;
+		border-radius: 6px;
+		transition: all 0.2s ease;
+	}
+
+		.nav-link:hover {
+			background-color: rgba(255, 255, 255, 0.15);
+			color: white;
+		}
+
+		.nav-link i {
+			margin-right: 10px;
+			width: 20px;
+			text-align: center;
+		}
+
+	/* Dropdown styling */
+	.dropdown-menu {
+		background-color: rgba(35, 150, 60, 0.8);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 8px;
+		border-radius: 6px;
+		margin-top: 5px;
+		box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+	}
+
+	.dropdown-item {
+		color: white;
+		padding: 8px 12px;
+		border-radius: 4px;
+		text-decoration: none;
+		display: block;
+	}
+
+		.dropdown-item:hover {
+			background-color: rgba(255, 255, 255, 0.15);
+		}
+
+	/* Teams section */
+	.teams-section {
+		padding: 15px 20px;
+		margin-top: 20px;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.team-item {
+		display: flex;
+		align-items: center;
+		padding: 8px 0;
+	}
+
+	.team-avatar {
+		width: 28px;
+		height: 28px;
+		border-radius: 6px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-right: 12px;
+		font-weight: 500;
+		background-color: rgba(255, 255, 255, 0.2);
+	}
+
+	/* User profile */
+	.user-profile {
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+		padding: 15px 20px;
+		display: flex;
+		align-items: center;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.user-avatar {
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		margin-right: 12px;
+		object-fit: cover;
+	}
+
+	.user-info {
+		flex: 1;
+	}
+
+	.user-name {
+		font-weight: 500;
+		margin: 0;
+	}
+
+	/* Badge for notifications */
+	.badge {
+		background-color: rgba(255, 255, 255, 0.2);
+		color: white;
+		border-radius: 999px;
+		padding: 2px 8px;
+		font-size: 12px;
+		margin-left: auto;
+	}
+</style>
+
+<!-- Trigger zone -->
+<div class="sidebar-trigger"></div>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+	<div class="sidebar-header">
+		<h3 class="mb-0">Dashboard</h3>
+	</div>
+
+	<ul class="sidebar-nav">
+		<li class="nav-item">
+			<a class="nav-link" asp-action="Index" asp-controller="Books">
+				<i class="fas fa-home"></i>
+				<span>Categories</span>
+				<span class="badge">5</span>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" asp-action="AddBook" asp-controller="Books">
+				<i class="fas fa-users"></i>
+				<span>Books</span>
+			</a>
+		</li>
+		@*		<li class="nav-item">
+			<a class="nav-link" href="#">
+				<i class="fas fa-project-diagram"></i>
+				<span>Projects</span>
+				<span class="badge">12</span>
+			</a>
+		</li>
+			<a class="nav-link" href="#">
+				<i class="fas fa-calendar"></i>
+				<span>Calendar</span>
+				<span class="badge">20+</span>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" href="#">
+				<i class="fas fa-file-alt"></i>
+				<span>Documents</span>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" href="#">
+				<i class="fas fa-chart-bar"></i>
+				<span>Reports</span>
+			</a>
+		</li>
+		*@
+
+		<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+				<i class="fas fa-cog"></i>
+				<span>Admin</span>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a class="dropdown-item" asp-action="Create" asp-controller="Admin">Create Account</a></li>
+				<li><a class="dropdown-item" asp-action="Index" asp-controller="Admin">Accounts</a></li>
+			</ul>
+		</li>
+	</ul>
+
+	@* <div class="teams-section"> 
+        <p class="text-sm text-gray-400 mb-2">Your teams</p>
+        <div class="team-item">
+            <div class="team-avatar">H</div>
+            <span>Heroicons</span>
+        </div>
+        <div class="team-item">
+            <div class="team-avatar">T</div>
+            <span>Tailwind Labs</span>
+        </div>
+        <div class="team-item">
+            <div class="team-avatar">W</div>
+            <span>Workcation</span>
+        </div>
+    </div>
+    *@
+
+	<div class="user-profile">
+		<img src="https://cdn-icons-png.flaticon.com/512/2206/2206368.png" alt="User" class="user-avatar">
+		<div class="user-info">
+			<p class="user-name">admin</p>
+		</div>
+		<span class="" onclick="handleSignOut()">@Html.Raw(logoutIcon)</span>
+	</div>
+</nav>
+<script>
+			document.addEventListener("DOMContentLoaded", function () {
+		let sidebar = document.querySelector(".sidebar");
+		let trigger = document.querySelector(".sidebar-trigger");
+
+		// Khi di chuột vào trigger, mở sidebar
+		trigger.addEventListener("mouseenter", function () {
+			sidebar.classList.add("active");
+		});
+
+		// Khi di chuột ra khỏi sidebar, ẩn sidebar
+		sidebar.addEventListener("mouseleave", function () {
+			sidebar.classList.remove("active");
+		});
+	});
+</script>
+
+

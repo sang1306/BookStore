@@ -48,6 +48,40 @@ function addCart(bookId) {
 
 }
 
+function addToWishList(bookId) {
+    $.ajax({
+        url: '/WishLish',
+        type: 'POST',
+        data: { bookId: bookId },
+        success: function (result) {
+            console.log(result);
+            // Show alert
+            alert('Book added to wishlist successfully!');
+
+            // Find and update the button class for this specific book
+            $(`button[data-bookid="${bookId}"]`).removeClass('btn-outline-danger').addClass('btn-danger');
+
+            console.log(result);
+        },
+        error: function (error) {
+            alert('Failed to add book to wishlist.');
+            console.log(error);
+        }
+    });
+}
+function removeWishList(bookId) {
+    $.ajax({
+        type: "delete",
+        url: `/wishlist/${bookId}`,
+        success: function (response) {
+            console.log(response);
+            alert(response);
+            window.location.reload();
+        }
+    });
+}
+
+
 function removeFromCart(bookId) {
     $.ajax({
         url: '/Orders/RemoveFromCart',

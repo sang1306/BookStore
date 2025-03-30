@@ -1,6 +1,5 @@
-﻿using BookStore.Dtos.Book;
+using BookStore.Filters;
 using BookStore.Models;
-using chat_application_demo.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +24,7 @@ namespace BookStore.Controllers
             _env = env;
         }
 
+        [TypeFilter(typeof(AdminFilter))]
         // Hiển thị danh sách thể loại
         [Route("viewCategories")]
         [HttpGet]
@@ -39,6 +39,7 @@ namespace BookStore.Controllers
             return View(categories);
         }
 
+        [TypeFilter(typeof(AdminFilter))]
         // Xử lý thêm thể loại sách 
         [HttpPost]
         [Route("AddCategory")]
@@ -61,6 +62,7 @@ namespace BookStore.Controllers
             return RedirectToAction("Index");
         }
 
+        [TypeFilter(typeof(AdminFilter))]
         // sửa thể loại
         [HttpPost]
         [Route("EditCategory")]
@@ -86,6 +88,7 @@ namespace BookStore.Controllers
         }
 
         //xóa thể loại
+        [TypeFilter(typeof(AdminFilter))]
         [HttpPost]
         [Route("DeleteCategory")]
         public async Task<IActionResult> DeleteCategory(int id)
@@ -111,6 +114,7 @@ namespace BookStore.Controllers
 
 
         [HttpGet]
+        [TypeFilter(typeof(AdminFilter))]
         public async Task<IActionResult> AddBook(string searchTitle, int? categoryId, string sortOrder, int page = 1)
         {
             var userSession = UserSessionManager.GetUserInfo(HttpContext);
@@ -198,6 +202,7 @@ namespace BookStore.Controllers
         }
 
         // thêm mới book
+        [TypeFilter(typeof(AdminFilter))]
         [HttpPost]
         [Route("addNewBook")]
         public async Task<IActionResult> AddNewBook(Book book, IFormFile ImageFile)
@@ -259,6 +264,7 @@ namespace BookStore.Controllers
         }
 
         // cập nhật book
+        [TypeFilter(typeof(AdminFilter))]
         [HttpPost]
         [Route("updateBook")]
         public async Task<IActionResult> UpdateBook(Book book, IFormFile ImageFile)
@@ -319,6 +325,7 @@ namespace BookStore.Controllers
 
 
         //xóa book
+        [TypeFilter(typeof(AdminFilter))]
         [HttpPost]
         [Route("deleteBook")]
         public async Task<IActionResult> DeleteBook(int id)
